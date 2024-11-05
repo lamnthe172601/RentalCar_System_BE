@@ -26,9 +26,9 @@ public partial class RentalCarDBContext : DbContext
     {
         modelBuilder.Entity<Car>(entity =>
         {
-            entity.HasKey(e => e.CarId).HasName("PK__Cars__68A0342E412CC39D");
+            entity.HasKey(e => e.CarId).HasName("PK__Cars__68A0342E3BF28D80");
 
-            entity.HasIndex(e => e.LicensePlate, "UQ__Cars__026BC15CA784C48D").IsUnique();
+            entity.HasIndex(e => e.LicensePlate, "UQ__Cars__026BC15C451960BD").IsUnique();
 
             entity.Property(e => e.CarId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Brand).HasMaxLength(50);
@@ -52,7 +52,7 @@ public partial class RentalCarDBContext : DbContext
 
         modelBuilder.Entity<CarAddress>(entity =>
         {
-            entity.HasKey(e => e.AddressId).HasName("PK__CarAddre__091C2AFB2E2DF4B7");
+            entity.HasKey(e => e.AddressId).HasName("PK__CarAddre__091C2AFBA3F9E618");
 
             entity.ToTable("CarAddress");
 
@@ -64,12 +64,12 @@ public partial class RentalCarDBContext : DbContext
 
             entity.HasOne(d => d.Car).WithMany(p => p.CarAddresses)
                 .HasForeignKey(d => d.CarId)
-                .HasConstraintName("FK__CarAddres__CarId__4CA06362");
+                .HasConstraintName("FK__CarAddres__CarId__4BAC3F29");
         });
 
         modelBuilder.Entity<RentalContract>(entity =>
         {
-            entity.HasKey(e => e.ContractId).HasName("PK__RentalCo__C90D3469CBD2AE22");
+            entity.HasKey(e => e.ContractId).HasName("PK__RentalCo__C90D3469C063D4D1");
 
             entity.Property(e => e.ContractId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.RentalDate).HasColumnType("datetime");
@@ -90,13 +90,13 @@ public partial class RentalCarDBContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C3B944F0E");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4CACFCEA6B");
 
-            entity.HasIndex(e => e.Username, "UQ__Users__536C85E4ACB0E295").IsUnique();
+            entity.HasIndex(e => e.Username, "UQ__Users__536C85E466C5F9BF").IsUnique();
 
-            entity.HasIndex(e => e.PhoneNumber, "UQ__Users__85FB4E3816924CE8").IsUnique();
+            entity.HasIndex(e => e.PhoneNumber, "UQ__Users__85FB4E38124E5DFF").IsUnique();
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D105340530558A").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D1053436C9ED61").IsUnique();
 
             entity.Property(e => e.UserId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Email)
@@ -124,6 +124,7 @@ public partial class RentalCarDBContext : DbContext
 
         OnModelCreatingPartial(modelBuilder);
     }
+
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
