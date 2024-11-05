@@ -11,17 +11,19 @@ public partial class User
 
     public string Username { get; set; }
 
-    public string FullName { get; set; }
+    public string Password { get; set; }
+
+    public string FullName { get; set; } = "User";
 
     public string Email { get; set; }
 
     public string PhoneNumber { get; set; }
 
-    public string Password { get; set; }
+    public string Image { get; set; } = "/images/default.jpg";
 
     public string Role { get; set; }
 
-    public string Status { get; set; }
+    public string Status { get; set; } = "ACTIVATED";
 
     public virtual ICollection<Car> Cars { get; set; } = new List<Car>();
 

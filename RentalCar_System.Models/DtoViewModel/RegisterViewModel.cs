@@ -1,0 +1,24 @@
+﻿using RentalCar_System.Models.Validations;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RentalCar_System.Models.DtoViewModel
+{
+    public class RegisterViewModel
+    {
+        [Required(ErrorMessage = "UserName is required")]
+        public string UserName { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Email is required")]
+        public string Email { get; set; } = string.Empty;
+        [PasswordValidator]
+        public string? Password { get; set; }
+
+        [Required(ErrorMessage = "PhoneNumber is required")]
+        public string PhoneNumber { get; set; } = string.Empty;        
+        public string Role { get; set; }=string.Empty;
+    }
+}
