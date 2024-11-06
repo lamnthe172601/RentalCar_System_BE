@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HealthcareAppointment.Business.BaseService
+namespace RentalCar_System.Business.BaseService
 {
     public interface IBaseService<T> where T : class
     {

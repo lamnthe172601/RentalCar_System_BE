@@ -1,11 +1,11 @@
-﻿using HealthCareAppointment.Data;
+﻿using RentalCar_System.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HealthcareAppointment.Business.BaseService
+namespace RentalCar_System.Business.BaseService
 {
     public class BaseService<T> : IBaseService<T> where T : class
     {

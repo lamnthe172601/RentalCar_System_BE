@@ -6,7 +6,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace HealthCareAppointment.Data
+namespace RentalCar_System.Data
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : class
     {

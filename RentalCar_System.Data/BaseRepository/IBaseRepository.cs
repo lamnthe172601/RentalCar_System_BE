@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HealthCareAppointment.Data
+namespace RentalCar_System.Data
 {
     public interface IBaseRepository<T> where T : class
     {

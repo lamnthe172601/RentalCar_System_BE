@@ -1,10 +1,13 @@
-﻿using HealthCareAppointment.Data;
+﻿using RentalCar_System.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using RentalCar_System.Data;
+using RentalCar_System.Business.RentalCarService;
+using RentalCar_System.Data.RentalContractRepository;
+using RentalCar_System.Models.Entity;
 using System.Text;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +22,8 @@ builder.Services.AddSwaggerGen();
 
 #region repository
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-
+builder.Services.AddScoped<IRentalContractRepository, RentalContractRepository>();
+builder.Services.AddScoped<IRentalContractService, RentalContractService>();
 #endregion
 #region JWT
 var jwtSettings = builder.Configuration.GetSection("Jwt");
