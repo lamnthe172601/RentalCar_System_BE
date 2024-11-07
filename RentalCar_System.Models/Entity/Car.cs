@@ -9,8 +9,6 @@ public partial class Car
 {
     public Guid CarId { get; set; }
 
-    public Guid? UserId { get; set; }
-
     public string Name { get; set; }
 
     public string LicensePlate { get; set; }
@@ -25,6 +23,8 @@ public partial class Car
 
     public int? Year { get; set; }
 
+    public string MadeIn { get; set; }
+
     public decimal? Mileage { get; set; }
 
     public string Status { get; set; }
@@ -33,11 +33,7 @@ public partial class Car
 
     public string Description { get; set; }
 
-    public string Image { get; set; }
-
-    public virtual ICollection<CarAddress> CarAddresses { get; set; } = new List<CarAddress>();
+    public virtual ICollection<Image> Images { get; set; } = new List<Image>();
 
     public virtual ICollection<RentalContract> RentalContracts { get; set; } = new List<RentalContract>();
-
-    public virtual User User { get; set; }
 }
