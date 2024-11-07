@@ -13,5 +13,7 @@ namespace RentalCar_System.Business.RentalCarService
     {
          Task<IEnumerable<RentalContract>> GetAllContractsByUserIdAsync(Guid userId);
         Task<RentalContract> GetRentalContractByIdAsync(Guid contractId);
+
+        Task<RentalContract> SendRentRequestAsync(Guid userId, Guid carId, DateTime rentalDate, DateTime returnDate);
     }
 }

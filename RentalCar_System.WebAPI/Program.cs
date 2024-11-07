@@ -7,6 +7,8 @@ using RentalCar_System.Business.RentalCarService;
 using RentalCar_System.Data.RentalContractRepository;
 using RentalCar_System.Models.Entity;
 using System.Text;
+using RentalCar_System.Data.CarRepository;
+using RentalCar_System.Business.CarService;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,7 +26,10 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped<IRentalContractRepository, RentalContractRepository>();
 builder.Services.AddScoped<IRentalContractService, RentalContractService>();
+builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<ICarService, CarService>();
 #endregion
+
 #region JWT
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 builder.Services.AddAuthentication(options =>
@@ -90,6 +95,13 @@ builder.Services.AddCors(options =>
     });
 });
 #endregion
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Cấu hình xử lý chu kỳ tham chiếu trong JSON
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+    });
+
 builder.Services.AddControllers();
 var app = builder.Build();
 

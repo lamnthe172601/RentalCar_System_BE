@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 namespace RentalCar_System.Data.RentalContractRepository
 {
     public interface IRentalContractRepository
-    {
+    {   
         Task<IEnumerable<RentalContract>> GetAllContractsByUserIdAsync(Guid userId);
         Task<RentalContract> GetRentalContractByIdAsync(Guid contractId);
+
+        Task<RentalContract> AddContractAsync(RentalContract rentalContract);
     }
 }

@@ -26,5 +26,12 @@ namespace RentalCar_System.Data.RentalContractRepository
             return await _context.RentalContracts.Include(rc => rc.Car)
                 .FirstOrDefaultAsync(rc => rc.ContractId == contractId);
         }
+
+        public async Task<RentalContract> AddContractAsync(RentalContract rentalContract)
+        {
+            await _context.RentalContracts.AddAsync(rentalContract);
+            await _context.SaveChangesAsync();
+            return rentalContract;
+        }
     }
 }
