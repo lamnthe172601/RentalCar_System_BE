@@ -9,6 +9,7 @@ using RentalCar_System.Models.Entity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RentalCar_System.WebAPI.Controllers
 {
@@ -37,7 +38,7 @@ namespace RentalCar_System.WebAPI.Controllers
             var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == model.Email.ToLower());
             if (user == null)
             {
-                return BadRequest(new { message = "Invalid username or password" });
+                return BadRequest(new { message = "Invalid email or password" });
             }
 
             if (!VerifyPassword(model.Password, user.Password))
@@ -48,7 +49,7 @@ namespace RentalCar_System.WebAPI.Controllers
             // Tạo claims chứa thông tin người dùng
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, model.Email),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Role, user.Role)  // Ví dụ thêm role vào claim
             };
@@ -87,7 +88,7 @@ namespace RentalCar_System.WebAPI.Controllers
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
                 return BadRequest(new { message = "Invalid data provided", errors });
-            }            
+            }
             if (await EmailExists(model.Email))
             {
                 return BadRequest(new { message = "Email already Exsist" });
@@ -98,10 +99,10 @@ namespace RentalCar_System.WebAPI.Controllers
             }
             var user = new User
             {
-                UserId = Guid.NewGuid(),                
+                UserId = Guid.NewGuid(),
                 Email = model.Email,
                 Password = HashPassword(model.Password),
-                PhoneNumber = model.PhoneNumber,               
+                PhoneNumber = model.PhoneNumber,
 
             };
             _dbContext.Add(user);
@@ -110,6 +111,31 @@ namespace RentalCar_System.WebAPI.Controllers
             return Ok(new { message = "Registration  successfully" });
         }
 
+        [HttpPost("change-password")]
+        [Authorize]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            { var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { message = "Invalid data provided", errors }); }
+            var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            if (emailClaim == null) 
+            { 
+                return Unauthorized(new { message = "Invalid token" });
+            }
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower()); 
+            if (user == null)
+            { 
+                return BadRequest(new { message = "User not found" });
+            }
+            if (!VerifyPassword(model.OldPassword, user.Password))
+            { 
+                return BadRequest(new { message = "Invalid old password" });
+            }
+            user.Password = HashPassword(model.NewPassword); _dbContext.Users.Update(user); 
+            await _dbContext.SaveChangesAsync(); 
+            return Ok(new { message = "Password changed successfully" });
+        }
         private async Task<bool> PhoneExists(string phone)
         {
             return await _dbContext.Users.AnyAsync(user => user.PhoneNumber == phone);
@@ -118,7 +144,7 @@ namespace RentalCar_System.WebAPI.Controllers
         private string HashPassword(string? password)
         {
             return BCrypt.Net.BCrypt.HashPassword(password);
-        }     
+        }
         private async Task<bool> EmailExists(string email)
         {
             return await _dbContext.Users.AnyAsync(user => user.Email.ToLower() == email.ToLower());
