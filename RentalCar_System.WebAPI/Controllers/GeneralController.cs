@@ -1,4 +1,4 @@
-﻿using HealthcareAppointment.Business.BaseService;
+﻿using RentalCar_System.Business.BaseService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +34,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 return BadRequest(new { message = "Invalid data provided", errors });
             }
 
-            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Username == model.Username);
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == model.Email.ToLower());
             if (user == null)
             {
                 return BadRequest(new { message = "Invalid username or password" });
@@ -48,7 +48,7 @@ namespace RentalCar_System.WebAPI.Controllers
             // Tạo claims chứa thông tin người dùng
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, model.Username),
+                new Claim(JwtRegisteredClaimNames.Sub, model.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Role, user.Role)  // Ví dụ thêm role vào claim
             };
@@ -87,11 +87,7 @@ namespace RentalCar_System.WebAPI.Controllers
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
                 return BadRequest(new { message = "Invalid data provided", errors });
-            }
-            if (await UserNamelExists(model.UserName))
-            {
-                return BadRequest(new { message = "UserName already Exsist" });
-            }
+            }            
             if (await EmailExists(model.Email))
             {
                 return BadRequest(new { message = "Email already Exsist" });
@@ -102,12 +98,10 @@ namespace RentalCar_System.WebAPI.Controllers
             }
             var user = new User
             {
-                UserId = Guid.NewGuid(),
-                Username = model.UserName,
+                UserId = Guid.NewGuid(),                
                 Email = model.Email,
                 Password = HashPassword(model.Password),
-                PhoneNumber = model.PhoneNumber,
-                Role = model.Role,
+                PhoneNumber = model.PhoneNumber,               
 
             };
             _dbContext.Add(user);
@@ -124,15 +118,7 @@ namespace RentalCar_System.WebAPI.Controllers
         private string HashPassword(string? password)
         {
             return BCrypt.Net.BCrypt.HashPassword(password);
-        }
-
-        private async Task<bool> UserNamelExists(string username)
-        {
-            return await _dbContext.Users.AnyAsync(user => user.Username.ToLower() == username.ToLower());
-        }
-
-
-
+        }     
         private async Task<bool> EmailExists(string email)
         {
             return await _dbContext.Users.AnyAsync(user => user.Email.ToLower() == email.ToLower());

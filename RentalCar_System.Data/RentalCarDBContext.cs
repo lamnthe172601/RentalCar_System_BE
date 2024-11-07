@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using RentalCar_System.Models.Entity;
-
 namespace RentalCar_System.Data;
 
 public partial class RentalCarDBContext : DbContext
 {
+    
     public RentalCarDBContext(DbContextOptions<RentalCarDBContext> options)
         : base(options)
     {
@@ -16,7 +16,7 @@ public partial class RentalCarDBContext : DbContext
 
     public virtual DbSet<Car> Cars { get; set; }
 
-    public virtual DbSet<CarAddress> CarAddresses { get; set; }
+    public virtual DbSet<Image> Images { get; set; }
 
     public virtual DbSet<RentalContract> RentalContracts { get; set; }
 
@@ -26,9 +26,9 @@ public partial class RentalCarDBContext : DbContext
     {
         modelBuilder.Entity<Car>(entity =>
         {
-            entity.HasKey(e => e.CarId).HasName("PK__Cars__68A0342E3BF28D80");
+            entity.HasKey(e => e.CarId).HasName("PK__Cars__68A0342E255B3D38");
 
-            entity.HasIndex(e => e.LicensePlate, "UQ__Cars__026BC15C451960BD").IsUnique();
+            entity.HasIndex(e => e.LicensePlate, "UQ__Cars__026BC15C26C93DB3").IsUnique();
 
             entity.Property(e => e.CarId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Brand).HasMaxLength(50);
@@ -36,6 +36,7 @@ public partial class RentalCarDBContext : DbContext
             entity.Property(e => e.LicensePlate)
                 .IsRequired()
                 .HasMaxLength(20);
+            entity.Property(e => e.MadeIn).HasMaxLength(50);
             entity.Property(e => e.Mileage).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.Model).HasMaxLength(50);
             entity.Property(e => e.Name).HasMaxLength(100);
@@ -44,32 +45,23 @@ public partial class RentalCarDBContext : DbContext
                 .IsRequired()
                 .HasMaxLength(20)
                 .HasDefaultValue("Available");
-
-            entity.HasOne(d => d.User).WithMany(p => p.Cars)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Cars__UserId__412EB0B6");
         });
 
-        modelBuilder.Entity<CarAddress>(entity =>
+        modelBuilder.Entity<Image>(entity =>
         {
-            entity.HasKey(e => e.AddressId).HasName("PK__CarAddre__091C2AFBA3F9E618");
+            entity.HasKey(e => e.ImgId).HasName("PK__Images__352F54F382964167");
 
-            entity.ToTable("CarAddress");
+            entity.Property(e => e.ImgId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.Image1).HasColumnName("Image");
 
-            entity.Property(e => e.AddressId).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.City).HasMaxLength(100);
-            entity.Property(e => e.District).HasMaxLength(100);
-            entity.Property(e => e.Street).HasMaxLength(255);
-            entity.Property(e => e.Ward).HasMaxLength(100);
-
-            entity.HasOne(d => d.Car).WithMany(p => p.CarAddresses)
-                .HasForeignKey(d => d.CarId)
-                .HasConstraintName("FK__CarAddres__CarId__4BAC3F29");
+            entity.HasOne(d => d.Cars).WithMany(p => p.Images)
+                .HasForeignKey(d => d.CarsId)
+                .HasConstraintName("FK__Images__CarsId__4316F928");
         });
 
         modelBuilder.Entity<RentalContract>(entity =>
         {
-            entity.HasKey(e => e.ContractId).HasName("PK__RentalCo__C90D3469C063D4D1");
+            entity.HasKey(e => e.ContractId).HasName("PK__RentalCo__C90D346917ABCCE0");
 
             entity.Property(e => e.ContractId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.RentalDate).HasColumnType("datetime");
@@ -81,28 +73,29 @@ public partial class RentalCarDBContext : DbContext
 
             entity.HasOne(d => d.Car).WithMany(p => p.RentalContracts)
                 .HasForeignKey(d => d.CarId)
-                .HasConstraintName("FK__RentalCon__CarId__46E78A0C");
+                .HasConstraintName("FK__RentalCon__CarId__47DBAE45");
 
             entity.HasOne(d => d.User).WithMany(p => p.RentalContracts)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__RentalCon__UserI__45F365D3");
+                .HasConstraintName("FK__RentalCon__UserI__46E78A0C");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4CACFCEA6B");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C911BC169");
 
-            entity.HasIndex(e => e.Username, "UQ__Users__536C85E466C5F9BF").IsUnique();
+            entity.HasIndex(e => e.PhoneNumber, "UQ__Users__85FB4E387DA64C92").IsUnique();
 
-            entity.HasIndex(e => e.PhoneNumber, "UQ__Users__85FB4E38124E5DFF").IsUnique();
-
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D1053436C9ED61").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534869B6CAE").IsUnique();
 
             entity.Property(e => e.UserId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Email)
                 .IsRequired()
                 .HasMaxLength(100);
-            entity.Property(e => e.FullName)
+            entity.Property(e => e.FirstName)
+                .IsRequired()
+                .HasMaxLength(100);
+            entity.Property(e => e.LastName)
                 .IsRequired()
                 .HasMaxLength(100);
             entity.Property(e => e.Password)
@@ -117,14 +110,10 @@ public partial class RentalCarDBContext : DbContext
             entity.Property(e => e.Status)
                 .IsRequired()
                 .HasMaxLength(10);
-            entity.Property(e => e.Username)
-                .IsRequired()
-                .HasMaxLength(50);
         });
 
         OnModelCreatingPartial(modelBuilder);
     }
-
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

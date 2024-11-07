@@ -10,8 +10,7 @@ namespace RentalCar_System.Models.DtoViewModel
 {
     public class RegisterViewModel
     {
-        [Required(ErrorMessage = "UserName is required")]
-        public string UserName { get; set; } = string.Empty;
+       
         [Required(ErrorMessage = "Email is required")]
         public string Email { get; set; } = string.Empty;
         [PasswordValidator]
@@ -19,6 +18,6 @@ namespace RentalCar_System.Models.DtoViewModel
 
         [Required(ErrorMessage = "PhoneNumber is required")]
         public string PhoneNumber { get; set; } = string.Empty;        
-        public string Role { get; set; }=string.Empty;
+        
     }
 }

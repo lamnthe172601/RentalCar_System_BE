@@ -15,11 +15,11 @@
    "T4TemplatePath": null,
    "Tables": [
       {
-         "Name": "[dbo].[CarAddress]",
+         "Name": "[dbo].[Cars]",
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[Cars]",
+         "Name": "[dbo].[Images]",
          "ObjectType": 0
       },
       {
