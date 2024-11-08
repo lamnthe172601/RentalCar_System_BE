@@ -18,12 +18,12 @@ namespace RentalCar_System.Data.RentalContractRepository
         }
         public async Task<IEnumerable<RentalContract>> GetAllContractsByUserIdAsync(Guid userId)
         {
-            return await _context.RentalContracts.Include(rc => rc.Car)
+            return await _context.RentalContracts
                 .Where(rc => rc.UserId == userId) .ToListAsync();
         }
         public async Task<RentalContract> GetRentalContractByIdAsync(Guid contractId)
         {
-            return await _context.RentalContracts.Include(rc => rc.Car)
+            return await _context.RentalContracts
                 .FirstOrDefaultAsync(rc => rc.ContractId == contractId);
         }
 

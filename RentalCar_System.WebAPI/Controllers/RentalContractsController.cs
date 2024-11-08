@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RentalCar_System.Business.RentalCarService;
 using RentalCar_System.Models.DtoViewModel;
@@ -7,6 +8,8 @@ using RentalCar_System.Models.Entity;
 namespace RentalCar_System.WebAPI.Controllers
 {
     [Route("api/[controller]")]
+    
+
     [ApiController]
     public class RentalContractsController : ControllerBase
     {

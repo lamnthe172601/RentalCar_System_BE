@@ -100,12 +100,7 @@ builder.Services.AddCors(options =>
     });
 });
 #endregion
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        // Cấu hình xử lý chu kỳ tham chiếu trong JSON
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
-    });
+
 
 builder.Services.AddControllers();
 var app = builder.Build();
