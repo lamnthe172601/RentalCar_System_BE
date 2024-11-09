@@ -67,9 +67,14 @@ namespace RentalCar_System.Business.UserService
             }
             return user;
         }
+
+        public async Task<User> GetUserByEmailAsync(string email)
+        {
+           return await _userRepository.GetByEmailAsync(email);
+        }
         #endregion
 
-       
+
     }
 
 }

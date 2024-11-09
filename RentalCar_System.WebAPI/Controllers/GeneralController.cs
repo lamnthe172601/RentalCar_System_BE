@@ -10,6 +10,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using RentalCar_System.Business.AuthService;
+using RentalCar_System.Business.UserService;
 
 namespace RentalCar_System.WebAPI.Controllers
 {
@@ -19,11 +21,16 @@ namespace RentalCar_System.WebAPI.Controllers
     {
         private readonly RentalCarDBContext _dbContext;
         private readonly IConfiguration _configuration;
+        private readonly IAuthService _authService;
+        private readonly IUserService _userService;
 
-        public GeneralController(RentalCarDBContext context, IConfiguration configuration)
+
+        public GeneralController(RentalCarDBContext context, IConfiguration configuration, IAuthService authService,IUserService userService)
         {
             _dbContext = context;
             _configuration = configuration;
+            _authService = authService;
+            _userService = userService;
         }
 
         [HttpPost("login")]
@@ -35,7 +42,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 return BadRequest(new { message = "Invalid data provided", errors });
             }
 
-            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == model.Email.ToLower());
+            var user = await _userService.GetUserByEmailAsync(model.Email);
             if (user == null)
             {
                 return BadRequest(new { message = "Invalid email or password" });
@@ -46,34 +53,10 @@ namespace RentalCar_System.WebAPI.Controllers
                 return BadRequest(new { message = "Invalid password" });
             }
 
-            // Tạo claims chứa thông tin người dùng
-            var claims = new[]
-            {
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, user.Role)  // Ví dụ thêm role vào claim
-            };
-
-            // Lấy thông tin JWT từ appsettings
-            var jwtSettings = _configuration.GetSection("Jwt");
-
-            // Tạo secret key từ appsettings
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"]));
-
-            // Tạo token descriptor
-            var token = new JwtSecurityToken(
-                issuer: jwtSettings["Issuer"],
-                audience: jwtSettings["Audience"],
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["ExpirationMinutes"])),
-                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
-            );
-
-            // Tạo JWT token
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+            var token = _authService.GenerateJwtToken(user);
 
             // Trả về token
-            return Ok(new { Token = tokenString });
+            return Ok(new { Token = token });
         }
 
         private bool VerifyPassword(string? passwordFE, string? passwordBE)

@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using RentalCar_System.Data;
+using RentalCar_System.Models.Entity;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -80,9 +81,12 @@ namespace RentalCar_System.Data
             return await _context.Set<T>().ToListAsync();
         }
 
-        public async Task<T> GetByUserNameAsync(string username)
+        public async Task<T> GetByEmailAsync(string email)
         {
-            return await _context.Set<T>().FindAsync(username);
+            {
+                return await _context.Set<T>().FirstOrDefaultAsync(u => (u as User).Email == email) as T;
+            }
+
         }
     }
 }
