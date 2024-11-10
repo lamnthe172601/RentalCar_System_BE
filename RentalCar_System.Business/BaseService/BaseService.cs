@@ -9,8 +9,8 @@ namespace RentalCar_System.Business.BaseService
 {
     public class BaseService<T> : IBaseService<T> where T : class
     {
+        protected readonly IBaseRepository<T> _baseRepository;
 
-        private readonly IBaseRepository<T> _baseRepository;
         public BaseService(IBaseRepository<T> baseRepository)
         {
             _baseRepository = baseRepository;

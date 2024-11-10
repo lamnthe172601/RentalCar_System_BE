@@ -1,14 +1,14 @@
-﻿
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RentalCar_System.Data;
+using RentalCar_System.Business.CarService; // Add this line
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<RentalCarDBContext>(options => 
+builder.Services.AddDbContext<RentalCarDBContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add services to the container.
 
@@ -19,8 +19,9 @@ builder.Services.AddSwaggerGen();
 
 #region repository
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-
+builder.Services.AddScoped<ICarService, CarService>(); // Add this line
 #endregion
+
 #region JWT
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 builder.Services.AddAuthentication(options =>
@@ -72,7 +73,6 @@ builder.Services.AddSwaggerGen(c =>
 
 #endregion
 
-
 #region CORS
 // Thêm dịch vụ CORS vào DI container.
 builder.Services.AddCors(options =>
@@ -86,6 +86,7 @@ builder.Services.AddCors(options =>
     });
 });
 #endregion
+
 builder.Services.AddControllers();
 var app = builder.Build();
 
