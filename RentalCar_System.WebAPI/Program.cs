@@ -2,8 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RentalCar_System.Business.AuthService;
+using RentalCar_System.Business.UserService;
 using RentalCar_System.Data;
 using RentalCar_System.Business.CarService; // Add this line
+using RentalCar_System.Data.UserRepository;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +14,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<RentalCarDBContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add services to the container.
-
+builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
