@@ -10,9 +10,7 @@ namespace RentalCar_System.Business.BaseService
     public interface IBaseService<T> where T : class
     {
 
-        Task<T> GetById(Guid id);
-        Task<T> GetByUserName(string username);
-
-        Task<T> SearchByName(string name);
+        Task<T> GetByIdAsync(Guid id);       
+        Task<T> SearchByNameAsync(string name);
     }
 }

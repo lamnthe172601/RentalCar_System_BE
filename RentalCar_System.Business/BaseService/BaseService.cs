@@ -16,17 +16,13 @@ namespace RentalCar_System.Business.BaseService
             _baseRepository = baseRepository;
         }
 
-        public async Task<T> GetById(Guid id)
+        public async Task<T> GetByIdAsync(Guid id)
         {
             return await _baseRepository.GetByIdAsync(id);
         }
 
-        public async Task<T> GetByUserName(string username)
-        {
-            return await _baseRepository.GetByUserNameAsync(username);
-        }
-
-        public async Task<T> SearchByName(string name)
+       
+        public async Task<T> SearchByNameAsync(string name)
         {
             return await _baseRepository.SearchByNameAsync(name);
         }
