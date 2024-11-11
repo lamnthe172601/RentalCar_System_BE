@@ -9,9 +9,9 @@ public partial class User
 {
     public Guid UserId { get; set; }
 
-    public string FirstName { get; set; } = "Customer";
+    public string FirstName { get; set; }
 
-    public string LastName { get; set; } = "1";
+    public string LastName { get; set; }
 
     public string Email { get; set; }
 
@@ -19,9 +19,11 @@ public partial class User
 
     public string PhoneNumber { get; set; }
 
-    public string Role { get; set; } = "customer";
+    public string Role { get; set; }
 
-    public string Status { get; set; } = "ACTIVATED";
+    public string Status { get; set; }
+
+    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
     public virtual ICollection<RentalContract> RentalContracts { get; set; } = new List<RentalContract>();
 }

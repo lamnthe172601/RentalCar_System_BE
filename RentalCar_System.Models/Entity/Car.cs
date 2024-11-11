@@ -29,6 +29,8 @@ public partial class Car
 
     public string Status { get; set; }
 
+    public DateTime? LockExpiration { get; set; }
+
     public decimal Price { get; set; }
 
     public string Description { get; set; }

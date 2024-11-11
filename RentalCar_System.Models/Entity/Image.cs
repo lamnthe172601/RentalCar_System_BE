@@ -9,9 +9,9 @@ public partial class Image
 {
     public Guid ImgId { get; set; }
 
-    public Guid? CarsId { get; set; }
+    public Guid? CarId { get; set; }
 
     public string Image1 { get; set; }
 
-    public virtual Car Cars { get; set; }
+    public virtual Car Car { get; set; }
 }
