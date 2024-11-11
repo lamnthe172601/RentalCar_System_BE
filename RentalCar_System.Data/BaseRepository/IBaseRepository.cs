@@ -14,7 +14,7 @@ namespace RentalCar_System.Data
         Task<IEnumerable<T>> GetAllAsync();
         Task<T> GetByIdAsync(Guid id);
         Task<T> SearchByNameAsync(string name);
-        Task<T> GetByUserNameAsync(string username);
+        Task<T> GetByEmailAsync(string email);
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);
         Task DeleteAsync(Guid id);

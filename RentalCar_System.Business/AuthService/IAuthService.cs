@@ -5,9 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RentalCar_System.Data.UserRepository
+namespace RentalCar_System.Business.AuthService
 {
-    public interface IUserRepository : IBaseRepository<User> 
-    {      
+    public interface IAuthService
+    {
+       string GenerateJwtToken(User user);
     }
 }

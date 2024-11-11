@@ -11,6 +11,7 @@ namespace RentalCar_System.Business.UserService
     {
         Task<IEnumerable<User>> GetAllUsersAsync();
         Task<User> GetUserByIdAsync(Guid id);
+        Task<User> GetUserByEmailAsync(string email);
         Task<User> AddUserAsync(User user);
         Task<User> UpdateUserAsync(User user);
         Task<User> DeleteUserAsync(Guid id);
