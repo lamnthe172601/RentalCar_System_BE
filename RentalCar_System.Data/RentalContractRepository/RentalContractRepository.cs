@@ -41,6 +41,39 @@ namespace RentalCar_System.Data.RentalContractRepository
             await _context.SaveChangesAsync(); 
             return rentalContract;
         }
+        public async Task<List<RentalContract>> GetAllAsync()
+        {
+            try
+            {
+                
+                return await _context.RentalContracts.ToListAsync();
+            }
+            catch (Exception)
+            {
+                
+                throw new Exception("An error occurred while retrieving rental contracts.");
+            }
+        }
+
+
+        public async Task<User> GetUserByContractIdAsync(Guid contractId)
+        {
+            try
+            {
+                var user = await _context.RentalContracts
+                    .Where(rc => rc.ContractId == contractId)
+                    .Select(rc => rc.User)
+                    .FirstOrDefaultAsync();
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"An error occurred while retrieving the user for the contract: {ex.Message}", ex);
+            }
+        }
+
+
 
 
 
