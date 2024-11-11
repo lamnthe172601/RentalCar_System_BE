@@ -17,7 +17,7 @@ builder.Services.AddDbContext<RentalCarDBContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Add services to the container.
 builder.Services.AddScoped<ICarRepository, CarRepository>();
-builder.Services.AddScoped<CarService>();
+builder.Services.AddScoped<ICarService, CarService>();
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -96,7 +96,13 @@ builder.Services.AddCors(options =>
 #endregion
 builder.Services.AddControllers();
 var app = builder.Build();
-
+// Cấu hình thư mục tĩnh
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "images")),
+    RequestPath = "/images"
+});
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
