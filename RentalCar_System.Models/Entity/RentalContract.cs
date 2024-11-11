@@ -25,7 +25,11 @@ public partial class RentalContract
 
     public int? Rating { get; set; }
 
+    public Guid? PaymentId { get; set; }
+
     public virtual Car Car { get; set; }
+
+    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
     public virtual User User { get; set; }
 }
