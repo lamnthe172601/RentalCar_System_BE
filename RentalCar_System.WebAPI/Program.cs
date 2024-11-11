@@ -15,7 +15,6 @@ using System.Text;
 using RentalCar_System.Data.CarRepository;
 using RentalCar_System.Business.CarService;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<RentalCarDBContext>(options =>
@@ -25,6 +24,9 @@ builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<ICarService, CarService>();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
