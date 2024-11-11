@@ -61,5 +61,37 @@ namespace RentalCar_System.Business.RentalCarService
             await _rentalContractRepository.AddContractAsync(rentalContract);
             return rentalContract;
         }
+
+        public async Task<bool> CancelRentalContractAsync(Guid contractId)
+        {
+            var contract = await _rentalContractRepository.GetRentalContractByIdAsync(contractId);
+
+            if (contract == null)
+            {
+                throw new Exception("Rental contract not found.");
+            }
+
+            
+            if (contract.Status != "Pending")
+            {
+                throw new Exception("Only pending contracts can be canceled.");
+            }
+
+            
+            contract.Status = "Active";
+            await _rentalContractRepository.UpdateContractAsync(contract);
+
+            return true;
+        }
+        public async Task<bool> UpdateFeedbackAndRatingAsync(Guid contractId, string feedback, int rating)
+        {
+            var contract = await _rentalContractRepository.GetRentalContractByIdAsync(contractId);
+            if (contract == null) return false;
+
+            contract.Feedback = feedback;
+            contract.Rating = rating;
+            await _rentalContractRepository.UpdateContractAsync(contract);
+            return true;
+        }
     }
 }

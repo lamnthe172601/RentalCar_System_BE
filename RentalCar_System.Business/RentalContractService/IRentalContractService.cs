@@ -15,5 +15,9 @@ namespace RentalCar_System.Business.RentalCarService
         Task<RentalContract> GetRentalContractByIdAsync(Guid contractId);
 
         Task<RentalContract> SendRentRequestAsync(Guid userId, Guid carId, DateTime rentalDate, DateTime returnDate);
+
+        Task<bool> CancelRentalContractAsync(Guid contractId);
+
+        Task<bool> UpdateFeedbackAndRatingAsync(Guid contractId, string feedback, int rating);
     }
 }

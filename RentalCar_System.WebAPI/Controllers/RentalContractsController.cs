@@ -58,5 +58,46 @@ namespace RentalCar_System.WebAPI.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPost("{contractId}/cancel")]
+        public async Task<IActionResult> CancelRentalContract(Guid contractId)
+        {
+            try
+            {
+                
+                var success = await _rentalContractService.CancelRentalContractAsync(contractId);
+
+                if (success)
+                {
+                    return Ok(new { message = "Rental contract canceled successfully." });
+                }
+
+                return BadRequest(new { message = "Failed to cancel the rental contract." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("{contractId}/feedback")]
+        public async Task<IActionResult> SubmitFeedbackAndRating(Guid contractId, [FromBody] FeedbackRatingRequest request)
+        {
+            try
+            {
+                var success = await _rentalContractService.UpdateFeedbackAndRatingAsync(contractId, request.Feedback, request.Rating);
+                if (success)
+                {
+                    return Ok(new { Message = "Feedback and rating submitted successfully." });
+                }
+                return BadRequest(new { Message = "Unable to submit feedback." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while submitting feedback.", Error = ex.Message });
+            }
+        }
+
+
     }
 }

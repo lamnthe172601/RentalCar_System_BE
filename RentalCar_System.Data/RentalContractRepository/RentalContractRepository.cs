@@ -27,11 +27,22 @@ namespace RentalCar_System.Data.RentalContractRepository
                 .FirstOrDefaultAsync(rc => rc.ContractId == contractId);
         }
 
+
         public async Task<RentalContract> AddContractAsync(RentalContract rentalContract)
         {
             await _context.RentalContracts.AddAsync(rentalContract);
             await _context.SaveChangesAsync();
             return rentalContract;
         }
+
+        public async Task<RentalContract> UpdateContractAsync(RentalContract rentalContract)
+        {
+            _context.RentalContracts.Update(rentalContract); 
+            await _context.SaveChangesAsync(); 
+            return rentalContract;
+        }
+
+
+
     }
 }

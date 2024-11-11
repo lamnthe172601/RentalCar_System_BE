@@ -13,5 +13,7 @@ namespace RentalCar_System.Data.RentalContractRepository
         Task<RentalContract> GetRentalContractByIdAsync(Guid contractId);
 
         Task<RentalContract> AddContractAsync(RentalContract rentalContract);
+
+        Task<RentalContract> UpdateContractAsync(RentalContract rentalContract);
     }
 }
