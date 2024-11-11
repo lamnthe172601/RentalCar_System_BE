@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using RentalCar_System.Data.CarRepository;
 using RentalCar_System.Models.Entity;
+using RentalCar_System.Models.DtoViewModel;
 
 namespace RentalCar_System.Business.CarService
 {
@@ -27,29 +28,33 @@ namespace RentalCar_System.Business.CarService
         {
             return await _carRepository.GetCarByIdAsync(carId);
         }
-        public async Task<IEnumerable<Car>> GetAllAsync()
+        public async Task<IEnumerable<Car>> GetAllCarsAsync()
         {
             return await _carRepository.GetAllAsync();
         }
 
-        public async Task<Car> GetByIdAsync(Guid id)
+        public async Task<CarDto> GetCarDTOByIdAsync(Guid id)
         {
-            return await _carRepository.GetByIdAsync(id);
+            return await _carRepository.GetCarDtoByIdAsync(id); // Trả về DTO
         }
+        
 
-        public async Task AddAsync(Car car)
+        public async Task AddCarAsync(Car car)
         {
-            await _carRepository.AddAsync(car);
+            await _carRepository.AddCarAsync(car);
         }
-
-        public async Task UpdateAsync(Car car)
+        public async Task UpdateCarAsync(Car car)
         {
-            await _carRepository.UpdateAsync(car);
+            await _carRepository.UpdateCarAsync(car);
         }
-
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteCarAsync(Guid id)
         {
-            await _carRepository.DeleteAsync(id);
+            await _carRepository.DeleteCarAsync(id);
+        }
+        public async Task<Car> GetCarByLicensePlateAsync(string licensePlate)
+        {
+            return await _carRepository.GetCarByLicensePlateAsync(licensePlate);
         }
     }
 }
+
