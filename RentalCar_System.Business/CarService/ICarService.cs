@@ -15,6 +15,7 @@ namespace RentalCar_System.Business.CarService
         Task<IEnumerable<Car>> GetAllCarsAsync();
         Task<CarDto> GetCarDTOByIdAsync(Guid id); 
         Task AddCarAsync(Car car);
+
         Task UpdateCarAsync(Car car);
 
         Task DeleteCarAsync(Guid id);
