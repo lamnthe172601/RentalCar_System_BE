@@ -14,6 +14,8 @@ using RentalCar_System.Data.UserRepository;
 using System.Text;
 using RentalCar_System.Data.CarRepository;
 using RentalCar_System.Business.CarService;
+using RentalCar_System.Business.NotificationService;
+using RentalCar_System.Business.Background;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,7 @@ builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<ICarService, CarService>();
 
 
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -38,6 +41,10 @@ builder.Services.AddScoped<IRentalContractRepository, RentalContractRepository>(
 builder.Services.AddScoped<IRentalContractService, RentalContractService>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddHostedService<ExpiringContractsBackgroundService>();
+
+
 #endregion
 
 #region JWT
@@ -114,6 +121,8 @@ app.UseStaticFiles(new StaticFileOptions
         Path.Combine(app.Environment.ContentRootPath, "Images")),
     RequestPath = "/api/cars/images"
 });
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
