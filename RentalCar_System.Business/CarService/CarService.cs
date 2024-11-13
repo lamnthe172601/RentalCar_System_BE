@@ -47,6 +47,7 @@ namespace RentalCar_System.Business.CarService
         {
             await _carRepository.UpdateCarAsync(car);
         }
+
         public async Task DeleteCarAsync(Guid id)
         {
             await _carRepository.DeleteCarAsync(id);
