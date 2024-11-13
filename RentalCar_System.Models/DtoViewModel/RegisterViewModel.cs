@@ -16,6 +16,8 @@ namespace RentalCar_System.Models.DtoViewModel
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")] 
         public string Email { get; set; } = string.Empty;
+        [Required(ErrorMessage = "PhoneNumber is required")]
+        public string PhoneNumber { get; set; } = string.Empty;
         [PasswordValidator]
         public string? Password { get; set; }
 

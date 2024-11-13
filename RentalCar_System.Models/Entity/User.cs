@@ -9,7 +9,7 @@ public partial class User
 {
     public Guid UserId { get; set; }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = " User";
 
     public string Email { get; set; }
 

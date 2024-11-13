@@ -122,7 +122,7 @@ namespace RentalCar_System.Business.RentalCarService
                             if (user != null && !string.IsNullOrEmpty(user.Email))
                             {
                                 var subject = "Reminder: Your rental car is due for return soon!";
-                                var message = $"Dear {user.FirstName},\n\n" +
+                                var message = $"Dear {user.Name},\n\n" +
                                               $"Your rental car (Contract ID: {contract.ContractId}) is due for return on {contract.ReturnDate?.ToString("dd/MM/yyyy")}.\n" +
                                               "Please return the car on time to avoid any late fees.";
 
