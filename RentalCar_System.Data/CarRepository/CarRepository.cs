@@ -46,11 +46,39 @@ namespace RentalCar_System.Data.CarRepository
             _context.Cars.Add(car);
             await _context.SaveChangesAsync();
         }
+
         public async Task UpdateCarAsync(Car car)
         {
-            _context.Cars.Update(car);
-            await _context.SaveChangesAsync();
+            var existingCar = await _context.Cars.Include(c => c.Images)
+                                                 .FirstOrDefaultAsync(c => c.CarId == car.CarId);
+
+            if (existingCar != null)
+            {
+                // Cập nhật thông tin Car
+                existingCar.Name = car.Name ?? existingCar.Name;
+                existingCar.LicensePlate = car.LicensePlate ?? existingCar.LicensePlate;
+                existingCar.Brand = car.Brand ?? existingCar.Brand;
+                existingCar.Model = car.Model ?? existingCar.Model;
+                existingCar.Color = car.Color ?? existingCar.Color;
+                existingCar.Seats = car.Seats ?? existingCar.Seats;
+                existingCar.Year = car.Year ?? existingCar.Year;
+                existingCar.MadeIn = car.MadeIn ?? existingCar.MadeIn;
+                existingCar.Mileage = car.Mileage ?? existingCar.Mileage;
+                existingCar.Status = car.Status ?? existingCar.Status;
+                existingCar.Price = car.Price;
+                existingCar.Description = car.Description ?? existingCar.Description;
+
+                // Nếu có ảnh mới, xóa ảnh cũ và thêm ảnh mới
+                if (car.Images != null && car.Images.Count > 0)
+                {
+                    _context.Images.RemoveRange(existingCar.Images); // Xóa ảnh cũ
+                    await _context.Images.AddRangeAsync(car.Images); // Thêm ảnh mới
+                }
+
+                await _context.SaveChangesAsync();
+            }
         }
+
 
         public async Task DeleteCarAsync(Guid id)
         {
