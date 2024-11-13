@@ -10,13 +10,13 @@ using RentalCar_System.Models.Entity;
 using RentalCar_System.Business.AuthService;
 using RentalCar_System.Business.UserService;
 using RentalCar_System.Data;
+using RentalCar_System.Business.CarService; // Add this line
 using RentalCar_System.Data.UserRepository;
 using System.Text;
 using RentalCar_System.Data.CarRepository;
 using RentalCar_System.Business.CarService;
 using RentalCar_System.Business.NotificationService;
 using RentalCar_System.Business.Background;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +27,9 @@ builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<ICarService, CarService>();
+
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -96,7 +99,6 @@ builder.Services.AddSwaggerGen(c =>
 
 #endregion
 
-
 #region CORS
 // Thêm dịch vụ CORS vào DI container.
 builder.Services.AddCors(options =>
@@ -107,7 +109,6 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader());
 });
 #endregion
-
 
 builder.Services.AddControllers();
 var app = builder.Build();

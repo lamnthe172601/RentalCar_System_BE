@@ -11,7 +11,7 @@ namespace RentalCar_System.WebAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles ="admin")]
+    
     public class UserController : ControllerBase
     {
         private readonly IUserService _userRepository;
@@ -22,6 +22,7 @@ namespace RentalCar_System.WebAPI.Controllers
         }
 
         [HttpGet("User")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAllUser()
         {
             var User = await _userRepository.GetAllUsersAsync();
@@ -29,6 +30,7 @@ namespace RentalCar_System.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> GetUserById(Guid id)
         {
             var User = await _userRepository.GetUserByIdAsync(id);
@@ -41,8 +43,7 @@ namespace RentalCar_System.WebAPI.Controllers
         {
            var user =await _userRepository.GetUserByIdAsync(id);
             if (user == null) return BadRequest(new { message = "Not found!"});
-            user.FirstName = model.FirstName;
-            user.LastName = model.LastName;
+            user.Name = model.Name;           
             user.PhoneNumber = model.PhoneNumber;
             await _userRepository.UpdateUserAsync(user);
             return NoContent();

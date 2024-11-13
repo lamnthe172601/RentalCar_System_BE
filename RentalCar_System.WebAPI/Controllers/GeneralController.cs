@@ -1,5 +1,4 @@
-﻿using RentalCar_System.Business.BaseService;
-using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -76,16 +75,13 @@ namespace RentalCar_System.WebAPI.Controllers
             {
                 return BadRequest(new { message = "Email already Exsist" });
             }
-            if (await PhoneExists(model.PhoneNumber))
-            {
-                return BadRequest(new { message = "PhoneNumber already Exsist" });
-            }
+            
             var user = new User
             {
                 UserId = Guid.NewGuid(),
                 Email = model.Email,
                 Password = HashPassword(model.Password),
-                PhoneNumber = model.PhoneNumber,
+                Name  = model.Name,
 
             };
             _dbContext.Add(user);
