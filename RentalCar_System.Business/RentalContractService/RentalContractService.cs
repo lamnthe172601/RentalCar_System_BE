@@ -100,11 +100,11 @@ namespace RentalCar_System.Business.RentalCarService
         {
             try
             {
-                // Define a threshold for contracts expiring in the next 2 days
+               
                 var expirationThreshold = TimeSpan.FromDays(2);
                 var currentDate = DateTime.UtcNow;
 
-                // Lấy tất cả hợp đồng
+               
                 var contracts = await _rentalContractRepository.GetAllAsync();
 
                 foreach (var contract in contracts)
@@ -113,12 +113,12 @@ namespace RentalCar_System.Business.RentalCarService
                     {
                         var daysRemaining = contract.ReturnDate.Value - currentDate;
 
-                        // Nếu hợp đồng còn ít hơn hoặc bằng 2 ngày nữa để trả xe
+                        
                         if (daysRemaining <= expirationThreshold && daysRemaining >= TimeSpan.Zero)
                         {
                             var user = await _rentalContractRepository.GetUserByContractIdAsync(contract.ContractId);
 
-                            // Nếu người dùng có email hợp lệ, gửi thông báo
+                          
                             if (user != null && !string.IsNullOrEmpty(user.Email))
                             {
                                 var subject = "Reminder: Your rental car is due for return soon!";
@@ -136,29 +136,6 @@ namespace RentalCar_System.Business.RentalCarService
             {
                 Console.WriteLine($"Error in NotifyExpiringContracts: {ex.Message}");
             }
-        }
-
-
-
-        public async Task<List<RentalContract>> GetAllAsync()
-        {
-            
-            var contracts = await _rentalContractRepository.GetAllAsync();
-            return contracts;
-        }
-
-        public async Task<User> GetUserByContractIdAsync(Guid contractId)
-        {
-            try
-            {
-                // Gọi phương thức từ repository để lấy người dùng từ hợp đồng
-                return await _rentalContractRepository.GetUserByContractIdAsync(contractId);
-            }
-            catch (Exception ex)
-            {
-                // Xử lý lỗi nếu có
-                throw new Exception($"Error occurred while fetching user for contract ID: {contractId}. Details: {ex.Message}");
-            }
-        }
+        }       
     }
 }

@@ -73,9 +73,5 @@ namespace RentalCar_System.Data.RentalContractRepository
             }
         }
 
-
-
-
-
     }
 }
