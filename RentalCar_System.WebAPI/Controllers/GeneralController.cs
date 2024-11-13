@@ -22,14 +22,21 @@ namespace RentalCar_System.WebAPI.Controllers
         private readonly IConfiguration _configuration;
         private readonly IAuthService _authService;
         private readonly IUserService _userService;
+        private readonly IWebHostEnvironment _environment;
 
-
-        public GeneralController(RentalCarDBContext context, IConfiguration configuration, IAuthService authService,IUserService userService)
+        public GeneralController(
+            RentalCarDBContext context,
+            IConfiguration configuration,
+            IAuthService authService,
+            IUserService userService,
+            IWebHostEnvironment environment
+            )
         {
             _dbContext = context;
             _configuration = configuration;
             _authService = authService;
             _userService = userService;
+            _environment = environment;
         }
 
         [HttpPost("login")]
@@ -99,24 +106,26 @@ namespace RentalCar_System.WebAPI.Controllers
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordViewModel model)
         {
             if (!ModelState.IsValid)
-            { var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                return BadRequest(new { message = "Invalid data provided", errors }); }
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { message = "Invalid data provided", errors });
+            }
             var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
-            if (emailClaim == null) 
-            { 
+            if (emailClaim == null)
+            {
                 return Unauthorized(new { message = "Invalid token" });
             }
-            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower()); 
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower());
             if (user == null)
-            { 
+            {
                 return BadRequest(new { message = "User not found" });
             }
             if (!VerifyPassword(model.OldPassword, user.Password))
-            { 
+            {
                 return BadRequest(new { message = "Invalid old password" });
             }
-            user.Password = HashPassword(model.NewPassword); _dbContext.Users.Update(user); 
-            await _dbContext.SaveChangesAsync(); 
+            user.Password = HashPassword(model.NewPassword); _dbContext.Users.Update(user);
+            await _dbContext.SaveChangesAsync();
             return Ok(new { message = "Password changed successfully" });
         }
         private async Task<bool> PhoneExists(string phone)
@@ -132,5 +141,116 @@ namespace RentalCar_System.WebAPI.Controllers
         {
             return await _dbContext.Users.AnyAsync(user => user.Email.ToLower() == email.ToLower());
         }
+
+        [HttpGet("Get-profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfileUser()
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { message = "Invalid data provided", errors });
+            }
+            var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            if (emailClaim == null)
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower());
+            if (user == null)
+            {
+                return BadRequest(new { message = "User not found" });
+            }
+            UserProfileViewModel model = new UserProfileViewModel
+            {
+                Name = user.Name,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                PhotoUrl = user.PhotoUrl,
+            };
+
+            return Ok(model);
+        }
+
+        [HttpPut("update-profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfileUser(UpdateUserViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { message = "Invalid data provided", errors });
+            }
+            var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            if (emailClaim == null)
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower());
+            if (user == null)
+            {
+                return BadRequest(new { message = "User not found" });
+            }
+            user.Name = model.Name;
+            if (await PhoneExists(model.PhoneNumber))
+            {
+                return BadRequest(new { message = "PhoneNumber already Exsist" });
+            }
+            user.PhoneNumber = model.PhoneNumber;
+            _dbContext.Users.Update(user);
+            await _dbContext.SaveChangesAsync();
+            return Ok(new { message = "Updated profile successfully" });
+        }
+
+        [HttpPost("upload-avatar")]
+        [Authorize]
+        public async Task<IActionResult> UploadAvatar(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest(new { message = "No file uploaded" });
+            }
+            try
+            {
+                var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+                if (emailClaim == null)
+                {
+                    return Unauthorized(new { message = "Invalid token" });
+                }
+                var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower());
+                if (user == null)
+                {
+                    return BadRequest(new { message = "User not found" });
+                }
+                var userId = user.UserId;
+                // Lấy userId từ token
+                var filePath = await _userService.UpdateUserAvatarAsync(userId, file);
+                return Ok(new { message = "File uploaded successfully", filePath });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpGet("get-avatar/{userId}")]
+        public async Task<IActionResult> GetAvatar(Guid userId)
+        {
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user == null || string.IsNullOrEmpty(user.PhotoUrl))
+            {
+                return NotFound(new { message = "User or avatar not found" });
+            }
+
+            var avatarPath = Path.Combine(_environment.ContentRootPath, user.PhotoUrl);
+            if (!System.IO.File.Exists(avatarPath))
+            {
+                return NotFound(new { message = "Avatar file not found" });
+            }
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(avatarPath);
+            return File(fileBytes, "image/jpeg"); // Hoặc định dạng ảnh khác nếu cần
+        }
+
     }
 }
