@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,7 +10,7 @@ namespace RentalCar_System.Models.DtoViewModel
 {
     public class CarDto
     {
-        public Guid CarId { get; set; }
+        public Guid? CarId { get; set; }
         public string Name { get; set; }
         public string LicensePlate { get; set; }
         public string Brand { get; set; }
@@ -24,5 +25,7 @@ namespace RentalCar_System.Models.DtoViewModel
         public string Description { get; set; }
         public List<string> Images { get; set; }
         public IFormFile Image { get; set; }
+     
+
     }
 }
