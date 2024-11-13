@@ -97,7 +97,21 @@ namespace RentalCar_System.WebAPI.Controllers
                 return StatusCode(500, new { Message = "An error occurred while submitting feedback.", Error = ex.Message });
             }
         }
-
+        [HttpGet("notify-expiring-contracts")]
+        public async Task<IActionResult> NotifyExpiringContracts()
+        {
+            try
+            {
+               
+                await _rentalContractService.NotifyExpiringContractsAsync();
+                return Ok("Email notifications for expiring contracts sent successfully.");
+            }
+            catch (Exception ex)
+            {
+                
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }      
 
     }
 }

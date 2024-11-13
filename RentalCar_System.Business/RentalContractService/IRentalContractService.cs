@@ -19,5 +19,8 @@ namespace RentalCar_System.Business.RentalCarService
         Task<bool> CancelRentalContractAsync(Guid contractId);
 
         Task<bool> UpdateFeedbackAndRatingAsync(Guid contractId, string feedback, int rating);
+        Task NotifyExpiringContractsAsync();
+       
+      
     }
 }
