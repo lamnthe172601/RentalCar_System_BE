@@ -154,73 +154,65 @@ namespace RentalCar_System.WebAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCar(Guid id, [FromForm] CarDto carDto)
+        public async Task<IActionResult> UpdateCar(Guid id, [FromForm] CarUpdateDto carUpdateDto)
         {
-            if (id == Guid.Empty || carDto == null)
-                return BadRequest("Invalid car data.");
+            if (id == Guid.Empty || carUpdateDto == null) return BadRequest("Invalid data.");
 
             var existingCar = await _carService.GetCarByIdAsync(id);
-            if (existingCar == null)
-                return NotFound("Car not found.");
+            if (existingCar == null) return NotFound("Car not found.");
 
-            // Cập nhật thông tin xe
-            existingCar.Name = carDto.Name;
-            existingCar.LicensePlate = carDto.LicensePlate;
-            existingCar.Brand = carDto.Brand;
-            existingCar.Model = carDto.Model;
-            existingCar.Color = carDto.Color;
-            existingCar.Seats = carDto.Seats;
-            existingCar.Year = carDto.Year;
-            existingCar.MadeIn = carDto.MadeIn;
-            existingCar.Mileage = carDto.Mileage;
-            existingCar.Status = carDto.Status;
-            existingCar.Price = carDto.Price;
-            existingCar.Description = carDto.Description;
+            string publicImagePath = null;
 
-            // Cập nhật hình ảnh
-            if (carDto.Image != null)
+            // Upload ảnh mới (nếu có)
+            if (carUpdateDto.Image != null)
             {
-                var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), ImagesFolder);
+                var imagesPath = Path.Combine(Directory.GetCurrentDirectory(), ImagesFolder);
 
-                if (!Directory.Exists(imagesFolder))
+                if (!Directory.Exists(imagesPath))
                 {
-                    Directory.CreateDirectory(imagesFolder);
+                    Directory.CreateDirectory(imagesPath);
                 }
 
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(carDto.Image.FileName)}";
-                var filePath = Path.Combine(imagesFolder, fileName);
+                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(carUpdateDto.Image.FileName)}";
+                var filePath = Path.Combine(imagesPath, fileName);
 
                 using (var stream = new FileStream(filePath, FileMode.Create))
                 {
-                    await carDto.Image.CopyToAsync(stream);
+                    await carUpdateDto.Image.CopyToAsync(stream);
                 }
 
-                // Xóa ảnh cũ
-                foreach (var image in existingCar.Images)
-                {
-                    var oldImagePath = Path.Combine(imagesFolder, Path.GetFileName(image.Image1));
-                    if (System.IO.File.Exists(oldImagePath))
-                    {
-                        System.IO.File.Delete(oldImagePath);
-                    }
-                }
-
-                // Cập nhật danh sách ảnh mới
-                existingCar.Images = new List<Models.Entity.Image>
-        {
-            new Models.Entity.Image
-            {
-                ImgId = Guid.NewGuid(),
-                CarId = existingCar.CarId,
-                Image1 = $"/api/cars/images/{fileName}"
+                publicImagePath = $"/api/cars/images/{fileName}";
             }
-        };
+
+            // Cập nhật thông tin Car
+            existingCar.Name = carUpdateDto.Name ?? existingCar.Name;
+            existingCar.LicensePlate = carUpdateDto.LicensePlate ?? existingCar.LicensePlate;
+            existingCar.Brand = carUpdateDto.Brand ?? existingCar.Brand;
+            existingCar.Model = carUpdateDto.Model ?? existingCar.Model;
+            existingCar.Color = carUpdateDto.Color ?? existingCar.Color;
+            existingCar.Seats = carUpdateDto.Seats ?? existingCar.Seats;
+            existingCar.Year = carUpdateDto.Year ?? existingCar.Year;
+            existingCar.MadeIn = carUpdateDto.MadeIn ?? existingCar.MadeIn;
+            existingCar.Mileage = carUpdateDto.Mileage ?? existingCar.Mileage;
+            existingCar.Status = carUpdateDto.Status ?? existingCar.Status;
+            existingCar.Price = carUpdateDto.Price;
+            existingCar.Description = carUpdateDto.Description ?? existingCar.Description;
+
+            if (publicImagePath != null)
+            {
+                // Xóa ảnh cũ và thêm ảnh mới
+                existingCar.Images.Clear();
+                existingCar.Images.Add(new Models.Entity.Image
+                {
+                    ImgId = Guid.NewGuid(),
+                    CarId = existingCar.CarId,
+                    Image1 = publicImagePath
+                });
             }
 
             await _carService.UpdateCarAsync(existingCar);
 
-            // Chuyển đổi entity sang DTO để trả về
-            var updatedCarDto = new CarDto
+            return Ok(new CarDto
             {
                 CarId = existingCar.CarId,
                 Name = existingCar.Name,
@@ -235,11 +227,11 @@ namespace RentalCar_System.WebAPI.Controllers
                 Status = existingCar.Status,
                 Price = existingCar.Price,
                 Description = existingCar.Description,
-                Images = existingCar.Images.Select(img => img.Image1).ToList()
-            };
-
-            return Ok(updatedCarDto);
+                Images = existingCar.Images.Select(i => i.Image1).ToList()
+            });
         }
+
+
 
         // DELETE: api/Car/{id}
         [HttpDelete("{id}")]
