@@ -27,9 +27,9 @@ public partial class RentalCarDBContext : DbContext
     {
         modelBuilder.Entity<Car>(entity =>
         {
-            entity.HasKey(e => e.CarId).HasName("PK__Cars__68A0342E457F8612");
+            entity.HasKey(e => e.CarId).HasName("PK__Cars__68A0342E623CC154");
 
-            entity.HasIndex(e => e.LicensePlate, "UQ__Cars__026BC15C34F65343").IsUnique();
+            entity.HasIndex(e => e.LicensePlate, "UQ__Cars__026BC15C9EA35C6F").IsUnique();
 
             entity.Property(e => e.CarId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Brand).HasMaxLength(50);
@@ -51,7 +51,7 @@ public partial class RentalCarDBContext : DbContext
 
         modelBuilder.Entity<Image>(entity =>
         {
-            entity.HasKey(e => e.ImgId).HasName("PK__Images__352F54F3EB342335");
+            entity.HasKey(e => e.ImgId).HasName("PK__Images__352F54F3C47D68DC");
 
             entity.Property(e => e.ImgId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Image1).HasColumnName("Image");
@@ -63,7 +63,7 @@ public partial class RentalCarDBContext : DbContext
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A38C75425A6");
+            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A38ECAD8B61");
 
             entity.Property(e => e.PaymentId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
@@ -86,7 +86,7 @@ public partial class RentalCarDBContext : DbContext
 
         modelBuilder.Entity<RentalContract>(entity =>
         {
-            entity.HasKey(e => e.ContractId).HasName("PK__RentalCo__C90D3469FC340AB7");
+            entity.HasKey(e => e.ContractId).HasName("PK__RentalCo__C90D3469A54CA3C0");
 
             entity.Property(e => e.ContractId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.RentalDate).HasColumnType("datetime");
@@ -107,28 +107,23 @@ public partial class RentalCarDBContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C02C4DFB0");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C2D13E610");
 
-            entity.HasIndex(e => e.PhoneNumber, "UQ__Users__85FB4E383886024B").IsUnique();
+            entity.HasIndex(e => e.PhoneNumber, "UQ__Users__85FB4E3864CA75E2").IsUnique();
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534E3575A84").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D1053417D68972").IsUnique();
 
             entity.Property(e => e.UserId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Email)
                 .IsRequired()
                 .HasMaxLength(100);
-            entity.Property(e => e.FirstName)
-                .IsRequired()
-                .HasMaxLength(100);
-            entity.Property(e => e.LastName)
+            entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(100);
             entity.Property(e => e.Password)
                 .IsRequired()
                 .HasMaxLength(255);
-            entity.Property(e => e.PhoneNumber)
-                .IsRequired()
-                .HasMaxLength(15);
+            entity.Property(e => e.PhoneNumber).HasMaxLength(15);
             entity.Property(e => e.Role)
                 .IsRequired()
                 .HasMaxLength(20);
