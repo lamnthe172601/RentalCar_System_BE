@@ -1,14 +1,20 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using RentalCar_System.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using RentalCar_System.Business.RentalCarService;
+using RentalCar_System.Data.RentalContractRepository;
+using RentalCar_System.Models.Entity;
 using RentalCar_System.Business.AuthService;
 using RentalCar_System.Business.UserService;
 using RentalCar_System.Data;
 using RentalCar_System.Business.CarService; // Add this line
 using RentalCar_System.Data.UserRepository;
 using System.Text;
+using RentalCar_System.Data.CarRepository;
+using RentalCar_System.Business.CarService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +25,9 @@ builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<ICarService, CarService>();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -26,7 +35,10 @@ builder.Services.AddSwaggerGen();
 
 #region repository
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-builder.Services.AddScoped<ICarService, CarService>(); // Add this line
+builder.Services.AddScoped<IRentalContractRepository, RentalContractRepository>();
+builder.Services.AddScoped<IRentalContractService, RentalContractService>();
+builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<ICarService, CarService>();
 #endregion
 
 #region JWT

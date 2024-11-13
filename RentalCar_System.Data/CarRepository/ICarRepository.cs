@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RentalCar_System.Business.CarService
+namespace RentalCar_System.Data.CarRepository
 {
-    public interface ICarService
+    public interface ICarRepository
     {
         Task<IEnumerable<Car>> GetAllAvailableCarsAsync();
         Task<Car> GetCarByIdAsync(Guid carId);
