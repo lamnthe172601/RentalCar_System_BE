@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RentalCar_System.Models.DtoViewModel;
 using RentalCar_System.Models.Entity;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,33 @@ namespace RentalCar_System.Data.RentalContractRepository
         {
             _context = context;
         }
-        public async Task<IEnumerable<RentalContract>> GetAllContractsByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<CarRented>> GetAllContractsByUserIdAsync(Guid userId)
         {
-            return await _context.RentalContracts
-                .Where(rc => rc.UserId == userId) .ToListAsync();
+            var rentalContracts = await _context.RentalContracts
+                .Include(rc => rc.Car)  
+                .Where(rc => rc.UserId == userId)
+                .ToListAsync();
+
+            var carRentedDTOs = rentalContracts.Select(rc => new CarRented
+            {
+                CarId = rc.Car.CarId,
+                Name = rc.Car.Name,
+                LicensePlate = rc.Car.LicensePlate,
+                Brand = rc.Car.Brand,
+                Model = rc.Car.Model,
+                Color = rc.Car.Color,
+                Seats = (int)rc.Car.Seats,
+                Year = (int)rc.Car.Year,
+                Price = rc.Car.Price,
+                RentalDate = rc.RentalDate.ToString("yyyy-MM-dd"),
+                ReturnDate = rc.ReturnDate?.ToString("yyyy-MM-dd"),
+                RentalTime = rc.RentalDate.ToString("HH:mm"),
+                ReturnTime = rc.ReturnDate?.ToString("HH:mm")
+            }).ToList();
+
+            return carRentedDTOs;
         }
+
         public async Task<RentalContract> GetRentalContractByIdAsync(Guid contractId)
         {
             return await _context.RentalContracts

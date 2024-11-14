@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RentalCar_System.Business.CarService;
 using RentalCar_System.Business.RentalCarService;
 using RentalCar_System.Models.DtoViewModel;
 using RentalCar_System.Models.Entity;
@@ -14,15 +15,22 @@ namespace RentalCar_System.WebAPI.Controllers
     public class RentalContractsController : ControllerBase
     {
         private readonly IRentalContractService _rentalContractService;
-        public RentalContractsController(IRentalContractService rentalContractService) { _rentalContractService = rentalContractService; }    
+        public RentalContractsController(IRentalContractService rentalContractService)
+        {
+            _rentalContractService = rentalContractService;
+        }
+
         [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<RentalContract>>> GetRentalContractsByUserId(Guid userId)
+        public async Task<ActionResult<IEnumerable<CarRented>>> GetRentalContractsByUserId(Guid userId)
         {
             var rentalContracts = await _rentalContractService.GetAllContractsByUserIdAsync(userId);
             if (rentalContracts == null || !rentalContracts.Any())
-            { return NotFound(); }
+            {
+                return NotFound();
+            }
             return Ok(rentalContracts);
         }
+
 
         [HttpGet("{contractId}")]
         public async Task<ActionResult<RentalContract>> GetRentalContractById(Guid contractId)

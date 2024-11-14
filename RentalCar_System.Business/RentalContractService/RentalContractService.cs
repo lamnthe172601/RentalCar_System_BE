@@ -3,6 +3,7 @@ using RentalCar_System.Business.NotificationService;
 using RentalCar_System.Data;
 using RentalCar_System.Data.CarRepository;
 using RentalCar_System.Data.RentalContractRepository;
+using RentalCar_System.Models.DtoViewModel;
 using RentalCar_System.Models.Entity;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace RentalCar_System.Business.RentalCarService
             _notificationService = notificationService;
         }
 
-        public async Task<IEnumerable<RentalContract>> GetAllContractsByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<CarRented>> GetAllContractsByUserIdAsync(Guid userId)
         {
             return await _rentalContractRepository.GetAllContractsByUserIdAsync(userId);
         }

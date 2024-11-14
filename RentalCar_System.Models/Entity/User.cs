@@ -23,6 +23,8 @@ public partial class User
 
     public string Status { get; set; } = " ACTIVATED";
 
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
     public virtual ICollection<RentalContract> RentalContracts { get; set; } = new List<RentalContract>();
