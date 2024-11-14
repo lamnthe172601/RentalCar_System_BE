@@ -35,6 +35,8 @@ public partial class Car
 
     public string Description { get; set; }
 
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+
     public virtual ICollection<Image> Images { get; set; } = new List<Image>();
 
     public virtual ICollection<RentalContract> RentalContracts { get; set; } = new List<RentalContract>();

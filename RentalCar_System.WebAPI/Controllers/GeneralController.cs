@@ -1,5 +1,4 @@
-﻿using RentalCar_System.Business.BaseService;
-using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -86,6 +85,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 Email = model.Email,
                 Password = HashPassword(model.Password),
                 PhoneNumber = model.PhoneNumber,
+                Name = model.Name,
 
             };
             _dbContext.Add(user);

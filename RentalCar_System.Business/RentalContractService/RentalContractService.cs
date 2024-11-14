@@ -1,7 +1,9 @@
 ﻿using RentalCar_System.Business.BaseService;
+using RentalCar_System.Business.NotificationService;
 using RentalCar_System.Data;
 using RentalCar_System.Data.CarRepository;
 using RentalCar_System.Data.RentalContractRepository;
+using RentalCar_System.Models.DtoViewModel;
 using RentalCar_System.Models.Entity;
 using System;
 using System.Collections.Generic;
@@ -15,13 +17,15 @@ namespace RentalCar_System.Business.RentalCarService
     {
         private readonly IRentalContractRepository _rentalContractRepository;
         private readonly ICarRepository _carRepository;
-        public RentalContractService(IRentalContractRepository rentalContractRepository , ICarRepository carRepository)
+        private readonly INotificationService _notificationService;
+        public RentalContractService(IRentalContractRepository rentalContractRepository , ICarRepository carRepository , INotificationService notificationService)
         {
             _rentalContractRepository = rentalContractRepository;
             _carRepository = carRepository;
+            _notificationService = notificationService;
         }
 
-        public async Task<IEnumerable<RentalContract>> GetAllContractsByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<CarRented>> GetAllContractsByUserIdAsync(Guid userId)
         {
             return await _rentalContractRepository.GetAllContractsByUserIdAsync(userId);
         }
@@ -93,5 +97,46 @@ namespace RentalCar_System.Business.RentalCarService
             await _rentalContractRepository.UpdateContractAsync(contract);
             return true;
         }
+        public async Task NotifyExpiringContractsAsync()
+        {
+            try
+            {
+               
+                var expirationThreshold = TimeSpan.FromDays(2);
+                var currentDate = DateTime.UtcNow;
+
+               
+                var contracts = await _rentalContractRepository.GetAllAsync();
+
+                foreach (var contract in contracts)
+                {
+                    if (contract.ReturnDate.HasValue)
+                    {
+                        var daysRemaining = contract.ReturnDate.Value - currentDate;
+
+                        
+                        if (daysRemaining <= expirationThreshold && daysRemaining >= TimeSpan.Zero)
+                        {
+                            var user = await _rentalContractRepository.GetUserByContractIdAsync(contract.ContractId);
+
+                          
+                            if (user != null && !string.IsNullOrEmpty(user.Email))
+                            {
+                                var subject = "Reminder: Your rental car is due for return soon!";
+                                var message = $"Dear {user.Name},\n\n" +
+                                              $"Your rental car (Contract ID: {contract.ContractId}) is due for return on {contract.ReturnDate?.ToString("dd/MM/yyyy")}.\n" +
+                                              "Please return the car on time to avoid any late fees.";
+
+                                await _notificationService.SendEmailNotificationAsync(user.Email, subject, message);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in NotifyExpiringContracts: {ex.Message}");
+            }
+        }       
     }
 }

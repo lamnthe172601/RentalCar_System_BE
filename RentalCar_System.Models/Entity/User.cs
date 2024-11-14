@@ -9,9 +9,7 @@ public partial class User
 {
     public Guid UserId { get; set; }
 
-    public string FirstName { get; set; }
-
-    public string LastName { get; set; }
+    public string Name { get; set; } = " User";
 
     public string Email { get; set; }
 
@@ -19,9 +17,13 @@ public partial class User
 
     public string PhoneNumber { get; set; }
 
-    public string Role { get; set; }
+    public string PhotoUrl { get; set; }
 
-    public string Status { get; set; }
+    public string Role { get; set; } = "customer";
+
+    public string Status { get; set; } = " ACTIVATED";
+
+    public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
