@@ -8,6 +8,6 @@ using System.Threading.Tasks;
 namespace RentalCar_System.Data.UserRepository
 {
     public interface IUserRepository : IBaseRepository<User> 
-    {      
+    {        
     }
 }

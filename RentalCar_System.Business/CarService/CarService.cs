@@ -5,8 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RentalCar_System.Data.CarRepository;
-using RentalCar_System.Models.Entity;
 
 namespace RentalCar_System.Business.CarService
 {
