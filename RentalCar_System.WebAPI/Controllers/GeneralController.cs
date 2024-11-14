@@ -233,9 +233,17 @@ namespace RentalCar_System.WebAPI.Controllers
             }
         }
 
-        [HttpGet("get-avatar/{userId}")]
-        public async Task<IActionResult> GetAvatar(Guid userId)
+        [HttpGet("get-avatar")]
+        [Authorize]
+        public async Task<IActionResult> GetAvatar()
         {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
+            if (userIdClaim == null)
+            {
+                return Unauthorized(new { message = "Invalid token" });
+            }
+
+            var userId = Guid.Parse(userIdClaim.Value);
             var user = await _userService.GetUserByIdAsync(userId);
             if (user == null || string.IsNullOrEmpty(user.PhotoUrl))
             {
@@ -249,7 +257,7 @@ namespace RentalCar_System.WebAPI.Controllers
             }
 
             var fileBytes = await System.IO.File.ReadAllBytesAsync(avatarPath);
-            return File(fileBytes, "image/jpeg"); // Hoặc định dạng ảnh khác nếu cần
+            return File(fileBytes, "image/jpeg"); // Or other image format if needed
         }
 
     }
