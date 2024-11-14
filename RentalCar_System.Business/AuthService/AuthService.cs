@@ -34,7 +34,8 @@ namespace RentalCar_System.Business.AuthService
             {
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, user.Role)
+                new Claim(ClaimTypes.Role, user.Role),
+                new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString())
         };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]));

@@ -109,7 +109,7 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader());
 });
 #endregion
-
+builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 var app = builder.Build();
 // Cấu hình để phục vụ các tệp tĩnh từ thư mục Images
@@ -117,10 +117,9 @@ var app = builder.Build();
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
-        Path.Combine(app.Environment.ContentRootPath, "Images")),
-    RequestPath = "/api/cars/images"
+    Path.Combine(app.Environment.ContentRootPath, "Images")),
+    RequestPath = "/images"
 });
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

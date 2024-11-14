@@ -1,4 +1,5 @@
-﻿using RentalCar_System.Models.Entity;
+﻿using Microsoft.AspNetCore.Http;
+using RentalCar_System.Models.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,9 @@ namespace RentalCar_System.Business.UserService
         Task<User> AddUserAsync(User user);
         Task<User> UpdateUserAsync(User user);
         Task<User> DeleteUserAsync(Guid id);
-       
+
+        Task<string> UpdateUserAvatarAsync(Guid userId, IFormFile avatarFile);
+
+
     }
 }

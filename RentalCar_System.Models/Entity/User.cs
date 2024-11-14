@@ -17,7 +17,7 @@ public partial class User
 
     public string PhoneNumber { get; set; }
 
-    public string PhotoUrl { get; set; }
+    public string PhotoUrl { get; set; } = "images\\image-profile\\default.jpg";
 
     public string Role { get; set; } = "customer";
 
