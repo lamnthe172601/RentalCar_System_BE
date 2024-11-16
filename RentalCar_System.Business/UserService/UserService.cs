@@ -112,7 +112,7 @@ namespace RentalCar_System.Business.UserService
                 await avatarFile.CopyToAsync(fileStream);
             }
 
-            user.PhotoUrl = Path.Combine("images", "image-profile", fileName);
+            user.PhotoUrl = Path.Combine("Images", "image-profile", fileName);
             await _userRepository.UpdateAsync(user);
 
             return user.PhotoUrl;

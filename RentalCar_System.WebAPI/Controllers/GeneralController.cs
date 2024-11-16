@@ -192,7 +192,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 return BadRequest(new { message = "User not found" });
             }
             user.Name = model.Name;
-            if (await PhoneExists(model.PhoneNumber))
+            if (user.PhoneNumber != model.PhoneNumber && await PhoneExists(model.PhoneNumber))
             {
                 return BadRequest(new { message = "PhoneNumber already Exsist" });
             }
@@ -237,17 +237,15 @@ namespace RentalCar_System.WebAPI.Controllers
         [Authorize]
         public async Task<IActionResult> GetAvatar()
         {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub);
-            if (userIdClaim == null)
+            var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+            if (emailClaim == null)
             {
                 return Unauthorized(new { message = "Invalid token" });
             }
-
-            var userId = Guid.Parse(userIdClaim.Value);
-            var user = await _userService.GetUserByIdAsync(userId);
-            if (user == null || string.IsNullOrEmpty(user.PhotoUrl))
+            var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower());
+            if (user == null)
             {
-                return NotFound(new { message = "User or avatar not found" });
+                return BadRequest(new { message = "User not found" });
             }
 
             var avatarPath = Path.Combine(_environment.ContentRootPath, user.PhotoUrl);
