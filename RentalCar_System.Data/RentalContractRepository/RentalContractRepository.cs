@@ -20,13 +20,15 @@ namespace RentalCar_System.Data.RentalContractRepository
         public async Task<IEnumerable<CarRented>> GetAllContractsByUserIdAsync(Guid userId)
         {
             var rentalContracts = await _context.RentalContracts
-                .Include(rc => rc.Car)  
-                .Where(rc => rc.UserId == userId)
+                .Include(rc => rc.Car)
+                .ThenInclude(c => c.Images).
+                Where(rc => rc.UserId == userId && rc.Status.Trim().ToLower() == "pending")
                 .ToListAsync();
 
             var carRentedDTOs = rentalContracts.Select(rc => new CarRented
-            {
+            {   
                 CarId = rc.Car.CarId,
+                ContractId = rc.ContractId,
                 Name = rc.Car.Name,
                 LicensePlate = rc.Car.LicensePlate,
                 Brand = rc.Car.Brand,
@@ -38,11 +40,13 @@ namespace RentalCar_System.Data.RentalContractRepository
                 RentalDate = rc.RentalDate.ToString("yyyy-MM-dd"),
                 ReturnDate = rc.ReturnDate?.ToString("yyyy-MM-dd"),
                 RentalTime = rc.RentalDate.ToString("HH:mm"),
-                ReturnTime = rc.ReturnDate?.ToString("HH:mm")
+                ReturnTime = rc.ReturnDate?.ToString("HH:mm"),
+                ImageUrls = rc.Car.Images.Select(img => img.Image1).ToList() 
             }).ToList();
 
             return carRentedDTOs;
         }
+
 
         public async Task<RentalContract> GetRentalContractByIdAsync(Guid contractId)
         {

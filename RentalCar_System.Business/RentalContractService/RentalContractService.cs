@@ -76,9 +76,9 @@ namespace RentalCar_System.Business.RentalCarService
             }
 
             
-            if (contract.Status != "Pending")
+            if (contract.Status.Trim().ToLower() != "pending")
             {
-                throw new Exception("Only pending contracts can be canceled.");
+                throw new Exception($"Only pending contracts can be canceled.{contract.Status}");
             }
 
             
