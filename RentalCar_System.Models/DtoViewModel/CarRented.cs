@@ -10,6 +10,8 @@ namespace RentalCar_System.Models.DtoViewModel
     {
         public Guid CarId { get; set; }
         public Guid ContractId { get; set; }
+        public Guid UserId { get; set; }    
+        public string MadeIn {  get; set; }
         public string Name { get; set; }
         public string LicensePlate { get; set; }
         public string Brand { get; set; }

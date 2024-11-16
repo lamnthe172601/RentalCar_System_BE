@@ -21,14 +21,19 @@ namespace RentalCar_System.WebAPI.Controllers
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<CarRented>>> GetRentalContractsByUserId(Guid userId)
+        public async Task<ActionResult> GetRentalContractsByUserId(Guid userId, int pageNumber = 1, int pageSize = 10)
         {
-            var rentalContracts = await _rentalContractService.GetAllContractsByUserIdAsync(userId);
+            var rentalContracts = await _rentalContractService.GetAllContractsByUserIdAsync(userId, pageNumber, pageSize);
             if (rentalContracts == null || !rentalContracts.Any())
             {
                 return NotFound();
             }
-            return Ok(rentalContracts);
+            var totalItems = await _rentalContractService.GetTotalContractsByUserIdAsync(userId);
+            return Ok(new
+            {
+                data = rentalContracts,
+                totalItems
+            });
         }
 
 

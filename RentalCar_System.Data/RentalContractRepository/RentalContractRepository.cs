@@ -22,13 +22,15 @@ namespace RentalCar_System.Data.RentalContractRepository
             var rentalContracts = await _context.RentalContracts
                 .Include(rc => rc.Car)
                 .ThenInclude(c => c.Images).
-                Where(rc => rc.UserId == userId && rc.Status.Trim().ToLower() == "pending")
+                Where(rc => rc.UserId == userId && rc.Status.Trim().ToLower() == "Completed")
                 .ToListAsync();
 
             var carRentedDTOs = rentalContracts.Select(rc => new CarRented
             {   
                 CarId = rc.Car.CarId,
+                UserId = userId,
                 ContractId = rc.ContractId,
+                MadeIn = rc.Car.MadeIn,
                 Name = rc.Car.Name,
                 LicensePlate = rc.Car.LicensePlate,
                 Brand = rc.Car.Brand,

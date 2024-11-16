@@ -12,7 +12,8 @@ namespace RentalCar_System.Business.RentalCarService
 {
     public interface IRentalContractService
     {
-         Task<IEnumerable<CarRented>> GetAllContractsByUserIdAsync(Guid userId);
+        Task<IEnumerable<CarRented>> GetAllContractsByUserIdAsync(Guid userId, int pageNumber, int pageSize);
+        Task<int> GetTotalContractsByUserIdAsync(Guid userId);
         Task<RentalContract> GetRentalContractByIdAsync(Guid contractId);
 
         Task<RentalContract> SendRentRequestAsync(Guid userId, Guid carId, DateTime rentalDate, DateTime returnDate);

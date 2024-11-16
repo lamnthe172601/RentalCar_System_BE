@@ -25,10 +25,22 @@ namespace RentalCar_System.Business.RentalCarService
             _notificationService = notificationService;
         }
 
-        public async Task<IEnumerable<CarRented>> GetAllContractsByUserIdAsync(Guid userId)
+        public async Task<IEnumerable<CarRented>> GetAllContractsByUserIdAsync(Guid userId, int pageNumber, int pageSize)
         {
-            return await _rentalContractRepository.GetAllContractsByUserIdAsync(userId);
+            var contracts = await _rentalContractRepository.GetAllContractsByUserIdAsync(userId);
+            return contracts.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
         }
+
+        public async Task<int> GetTotalContractsByUserIdAsync(Guid userId)
+        {
+            
+            var contracts = await _rentalContractRepository.GetAllContractsByUserIdAsync(userId);
+
+           
+            return contracts.Count();
+        }
+
+
 
         public async Task<RentalContract> GetRentalContractByIdAsync(Guid contractId)
         {
@@ -76,13 +88,13 @@ namespace RentalCar_System.Business.RentalCarService
             }
 
             
-            if (contract.Status.Trim().ToLower() != "pending")
+            if (contract.Status.Trim() != "Completed")
             {
-                throw new Exception($"Only pending contracts can be canceled.{contract.Status}");
+                throw new Exception($"Only Completed contracts can be canceled.{contract.Status}");
             }
 
             
-            contract.Status = "Active";
+            contract.Status = "Cancelled";
             await _rentalContractRepository.UpdateContractAsync(contract);
 
             return true;
