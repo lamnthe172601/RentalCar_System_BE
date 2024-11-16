@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using RentalCar_System.Models.DtoViewModel;
 
 namespace RentalCar_System.Data.CarRepository
 {
@@ -24,40 +25,102 @@ namespace RentalCar_System.Data.CarRepository
            .ToListAsync();
         }
 
-        public async Task<Car> GetCarByIdAsync(Guid carId)
+        public async Task<Car> GetCarByIdAsync(Guid id)
         {
             return await _context.Cars
-           .FirstOrDefaultAsync(car => car.CarId == carId);
+                .Include(c => c.Images) // Bao gồm danh sách Images
+                .FirstOrDefaultAsync(c => c.CarId == id);
         }
         public async Task<IEnumerable<Car>> GetAllAsync()
         {
-            return await _context.Cars.ToListAsync();
+            return await _context.Cars.Include(c => c.Images).ToListAsync();
         }
 
         public async Task<Car> GetByIdAsync(Guid id)
         {
-            return await _context.Cars.FindAsync(id);
+            return await _context.Cars.Include(c => c.Images).FirstOrDefaultAsync(c => c.CarId == id);
         }
 
-        public async Task AddAsync(Car car)
+        public async Task AddCarAsync(Car car)
         {
             _context.Cars.Add(car);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(Car car)
+        public async Task UpdateCarAsync(Car car)
         {
-            if (car == null) throw new ArgumentNullException(nameof(car));
-            _context.Entry(car).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            var existingCar = await _context.Cars.Include(c => c.Images)
+                                                 .FirstOrDefaultAsync(c => c.CarId == car.CarId);
+
+            if (existingCar != null)
+            {
+                // Cập nhật thông tin Car
+                existingCar.Name = car.Name ?? existingCar.Name;
+                existingCar.LicensePlate = car.LicensePlate ?? existingCar.LicensePlate;
+                existingCar.Brand = car.Brand ?? existingCar.Brand;
+                existingCar.Model = car.Model ?? existingCar.Model;
+                existingCar.Color = car.Color ?? existingCar.Color;
+                existingCar.Seats = car.Seats ?? existingCar.Seats;
+                existingCar.Year = car.Year ?? existingCar.Year;
+                existingCar.MadeIn = car.MadeIn ?? existingCar.MadeIn;
+                existingCar.Mileage = car.Mileage ?? existingCar.Mileage;
+                existingCar.Status = car.Status ?? existingCar.Status;
+                existingCar.Price = car.Price;
+                existingCar.Description = car.Description ?? existingCar.Description;
+
+                // Nếu có ảnh mới, xóa ảnh cũ và thêm ảnh mới
+                if (car.Images != null && car.Images.Count > 0)
+                {
+                    _context.Images.RemoveRange(existingCar.Images); // Xóa ảnh cũ
+                    await _context.Images.AddRangeAsync(car.Images); // Thêm ảnh mới
+                }
+
+                await _context.SaveChangesAsync();
+            }
         }
 
-        public async Task DeleteAsync(Guid id)
+
+        public async Task DeleteCarAsync(Guid id)
         {
-            var car = await _context.Cars.FindAsync(id);
-            if (car == null) throw new KeyNotFoundException($"Car with ID {id} not found.");
-            _context.Cars.Remove(car);
-            await _context.SaveChangesAsync();
+            var car = await _context.Cars
+                .Include(c => c.Images) // Bao gồm các ảnh liên kết
+                .FirstOrDefaultAsync(c => c.CarId == id);
+
+            if (car != null)
+            {
+                _context.Cars.Remove(car); // Xóa Car
+                await _context.SaveChangesAsync();
+            }
+        }
+        public async Task<Car> GetCarByLicensePlateAsync(string licensePlate)
+        {
+            return await _context.Cars
+                .FirstOrDefaultAsync(c => c.LicensePlate == licensePlate); // Kiểm tra Car có LicensePlate trùng
+        }
+     
+
+        public async Task<CarDto> GetCarDtoByIdAsync(Guid id)
+        {
+            var car = await _context.Cars.Include(c => c.Images).FirstOrDefaultAsync(c => c.CarId == id);
+            if (car == null) return null;
+
+            return new CarDto
+            {
+                CarId = car.CarId,
+                Name = car.Name,
+                LicensePlate = car.LicensePlate,
+                Brand = car.Brand,
+                Model = car.Model,
+                Color = car.Color,
+                Seats = car.Seats,
+                Year = car.Year,
+                MadeIn = car.MadeIn,
+                Mileage = car.Mileage,
+                Status = car.Status,
+                Price = car.Price,
+                Description = car.Description,
+                Images = car.Images.Select(img => $"/images/{img.Image1}").ToList()
+            };
         }
     }
 }
