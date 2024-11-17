@@ -27,8 +27,8 @@ public class TokenCleanupService : IHostedService, IDisposable
         using (var scope = _serviceProvider.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<RentalCarDBContext>();
-            var expiredTokens = dbContext.PasswordResetTokens.Where(t => t.ExpiresAt < DateTime.UtcNow);
-            dbContext.PasswordResetTokens.RemoveRange(expiredTokens);
+            var expiredTokens = dbContext.Tokens.Where(t => t.ExpiresAt < DateTime.UtcNow);
+            dbContext.Tokens.RemoveRange(expiredTokens);
             dbContext.SaveChanges();
         }
     }

@@ -27,15 +27,15 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[PasswordResetTokens]",
-         "ObjectType": 0
-      },
-      {
          "Name": "[dbo].[Payments]",
          "ObjectType": 0
       },
       {
          "Name": "[dbo].[RentalContracts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Tokens]",
          "ObjectType": 0
       },
       {

@@ -17,17 +17,21 @@ public partial class User
 
     public string PhoneNumber { get; set; }
 
-    public string PhotoUrl { get; set; }
+    public string PhotoUrl { get; set; } = "images\\image-profile\\default.jpg";
 
-    public string Role { get; set; }
+    public string Role { get; set; } = "customer";
 
-    public string Status { get; set; }
+    public string Status { get; set; } = " ACTIVATED";
+
+    public bool IsEmailConfirmed { get; set; } = false;
+
+    public DateTime CreatedAt { get; set; } = DateTime.Now;
 
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
-
-    public virtual ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
     public virtual ICollection<RentalContract> RentalContracts { get; set; } = new List<RentalContract>();
+
+    public virtual ICollection<Token> Tokens { get; set; } = new List<Token>();
 }

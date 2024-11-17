@@ -5,13 +5,13 @@ using System.Collections.Generic;
 
 namespace RentalCar_System.Models.Entity;
 
-public partial class PasswordResetToken
+public partial class Token
 {
     public Guid TokenId { get; set; }
 
     public Guid? UserId { get; set; }
 
-    public string Token { get; set; }
+    public string Token1 { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

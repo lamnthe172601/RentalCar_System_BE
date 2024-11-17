@@ -30,8 +30,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddHostedService<TokenCleanupService>();
-
-
+builder.Services.AddMemoryCache();
+builder.Services.AddHostedService<AccountCleanupService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

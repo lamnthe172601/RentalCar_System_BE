@@ -19,11 +19,11 @@ public partial class RentalCarDBContext : DbContext
 
     public virtual DbSet<Image> Images { get; set; }
 
-    public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
-
     public virtual DbSet<Payment> Payments { get; set; }
 
     public virtual DbSet<RentalContract> RentalContracts { get; set; }
+
+    public virtual DbSet<Token> Tokens { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
 
@@ -85,24 +85,6 @@ public partial class RentalCarDBContext : DbContext
                 .HasConstraintName("FK__Images__CarId__4222D4EF");
         });
 
-        modelBuilder.Entity<PasswordResetToken>(entity =>
-        {
-            entity.HasKey(e => e.TokenId).HasName("PK__Password__658FEEEA40727EE8");
-
-            entity.Property(e => e.TokenId).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.ExpiresAt).HasColumnType("datetime");
-            entity.Property(e => e.Token)
-                .IsRequired()
-                .HasMaxLength(100);
-
-            entity.HasOne(d => d.User).WithMany(p => p.PasswordResetTokens)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__PasswordR__UserI__70DDC3D8");
-        });
-
         modelBuilder.Entity<Payment>(entity =>
         {
             entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A38ECAD8B61");
@@ -147,6 +129,25 @@ public partial class RentalCarDBContext : DbContext
                 .HasConstraintName("FK__RentalCon__UserI__45F365D3");
         });
 
+        modelBuilder.Entity<Token>(entity =>
+        {
+            entity.HasKey(e => e.TokenId).HasName("PK__Password__658FEEEA40727EE8");
+
+            entity.Property(e => e.TokenId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ExpiresAt).HasColumnType("datetime");
+            entity.Property(e => e.Token1)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("Token");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Tokens)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK__PasswordR__UserI__70DDC3D8");
+        });
+
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C2D13E610");
@@ -156,6 +157,9 @@ public partial class RentalCarDBContext : DbContext
             entity.HasIndex(e => e.Email, "UQ__Users__A9D1053417D68972").IsUnique();
 
             entity.Property(e => e.UserId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Email)
                 .IsRequired()
                 .HasMaxLength(100);
