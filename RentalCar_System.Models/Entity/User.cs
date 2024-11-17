@@ -9,7 +9,7 @@ public partial class User
 {
     public Guid UserId { get; set; }
 
-    public string Name { get; set; } = " User";
+    public string Name { get; set; }
 
     public string Email { get; set; }
 
@@ -17,13 +17,15 @@ public partial class User
 
     public string PhoneNumber { get; set; }
 
-    public string PhotoUrl { get; set; } = "images\\image-profile\\default.jpg";
+    public string PhotoUrl { get; set; }
 
-    public string Role { get; set; } = "customer";
+    public string Role { get; set; }
 
-    public string Status { get; set; } = " ACTIVATED";
+    public string Status { get; set; }
 
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
+
+    public virtual ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
