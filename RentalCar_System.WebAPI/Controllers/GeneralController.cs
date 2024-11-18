@@ -202,7 +202,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 Name = user.Name,
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
-                PhotoUrl = user.PhotoUrl,
+                Photo = user.Photo,
             };
 
             return Ok(model);
@@ -258,10 +258,17 @@ namespace RentalCar_System.WebAPI.Controllers
                 {
                     return BadRequest(new { message = "Không tìm thấy người dùng." });
                 }
-                var userId = user.UserId;
-                // Lấy userId từ token
-                var filePath = await _userService.UpdateUserAvatarAsync(userId, file);
-                return Ok(new { message = "File cập nhật thành công.", filePath });
+
+                using (var memoryStream = new MemoryStream())
+                {
+                    await file.CopyToAsync(memoryStream);
+                    user.Photo = memoryStream.ToArray();
+                }
+
+                _dbContext.Users.Update(user);
+                await _dbContext.SaveChangesAsync();
+
+                return Ok(new { message = "File cập nhật thành công." });
             }
             catch (Exception ex)
             {
@@ -284,15 +291,14 @@ namespace RentalCar_System.WebAPI.Controllers
                 return BadRequest(new { message = "Không tìm thấy người dùng." });
             }
 
-            var avatarPath = Path.Combine(_environment.ContentRootPath, user.PhotoUrl);
-            if (!System.IO.File.Exists(avatarPath))
+            if (user.Photo == null || user.Photo.Length == 0)
             {
                 return NotFound(new { message = "không tìm thấy Avatar" });
             }
 
-            var fileBytes = await System.IO.File.ReadAllBytesAsync(avatarPath);
-            return File(fileBytes, "image/jpeg"); // Or other image format if needed
+            return File(user.Photo, "image/jpeg"); // Or other image format if needed
         }
+
 
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)

@@ -14,7 +14,7 @@ namespace RentalCar_System.Models.DtoViewModel
 
         public string PhoneNumber { get; set; } = string.Empty;
 
-        public string PhotoUrl { get; set; } = string.Empty;
+        public byte[] Photo { get; set; }
 
     }
 }

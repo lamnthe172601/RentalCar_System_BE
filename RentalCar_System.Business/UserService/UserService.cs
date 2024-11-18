@@ -86,36 +86,15 @@ namespace RentalCar_System.Business.UserService
             if (user == null)
                 throw new InvalidOperationException("User not found");
 
-            var uploadsFolder = Path.Combine(_environment.ContentRootPath, "Images", "image-profile");
-            if (!Directory.Exists(uploadsFolder))
+            using (var memoryStream = new MemoryStream())
             {
-                Directory.CreateDirectory(uploadsFolder);
+                await avatarFile.CopyToAsync(memoryStream);
+                user.Photo = memoryStream.ToArray();
             }
 
-            // Xóa ảnh đại diện cũ nếu có
-            if (!string.IsNullOrEmpty(user.PhotoUrl))
-            {
-                var oldAvatarPath = Path.Combine(_environment.ContentRootPath, user.PhotoUrl);
-                if (File.Exists(oldAvatarPath))
-                {
-                    File.Delete(oldAvatarPath);
-                }
-            }
-
-            // Tạo tên tệp với userId
-            var fileName = $"{userId}{Path.GetExtension(avatarFile.FileName)}";
-            var filePath = Path.Combine(uploadsFolder, fileName);
-
-            // Lưu tệp mới
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await avatarFile.CopyToAsync(fileStream);
-            }
-
-            user.PhotoUrl = Path.Combine("Images", "image-profile", fileName);
             await _userRepository.UpdateAsync(user);
 
-            return user.PhotoUrl;
+            return "Avatar updated successfully";
         }
 
     }
