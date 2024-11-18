@@ -34,7 +34,7 @@ namespace RentalCar_System.Business.CartService
                 CartId = c.CartId,
                 CarId = (Guid)c.CarId,
                 CarName = c.Car.Name,
-                CarModel = c.Car.Model,
+                CarStatus = c.Car.Status,
                 Price = c.Car.Price,
                 DateAdded = c.DateAdded ?? DateTime.UtcNow,
                 CarImages = c.Car.Images.Select(i => Convert.ToBase64String(i.Photo)).ToList()
