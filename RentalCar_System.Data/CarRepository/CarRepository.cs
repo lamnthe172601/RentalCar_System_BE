@@ -119,7 +119,7 @@ namespace RentalCar_System.Data.CarRepository
                 Status = car.Status,
                 Price = car.Price,
                 Description = car.Description,
-                Images = car.Images.Select(img => $"/images/{img.Image1}").ToList()
+                Images = car.Images.Select(img => img.Photo).ToList()
             };
         }
     }
