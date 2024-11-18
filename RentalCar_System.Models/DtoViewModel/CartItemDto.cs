@@ -16,6 +16,6 @@ namespace RentalCar_System.Models.DtoViewModel
         public decimal Price { get; set; }  
         public DateTime DateAdded { get; set; }
 
-        public List<string> CarImages { get; set; } = new List<string>();
+        public List<byte[]> CarImages { get; set; } = new List<byte[]>();
     }
 }

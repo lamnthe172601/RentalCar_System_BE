@@ -119,14 +119,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 var app = builder.Build();
-// Cấu hình để phục vụ các tệp tĩnh từ thư mục Images
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-    Path.Combine(app.Environment.ContentRootPath, "Images")),
-    RequestPath = "/images"
-});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
