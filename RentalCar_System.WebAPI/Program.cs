@@ -19,6 +19,7 @@ using RentalCar_System.Business.NotificationService;
 using RentalCar_System.Business.Background;
 using RentalCar_System.Data.CartRepository;
 using RentalCar_System.Business.CartService;
+using RentalCar_System.Business.QueueService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,7 @@ builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<ICartRepository , CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IQueueService, QueueService>();
 
 
 builder.Services.AddHostedService<TokenCleanupService>();

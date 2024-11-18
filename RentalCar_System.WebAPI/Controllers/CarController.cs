@@ -74,7 +74,7 @@ namespace RentalCar_System.WebAPI.Controllers
         // POST: api/Car
 
         [HttpPost("add-car")]
-        [Authorize(Roles = "admin")]
+        
         public async Task<IActionResult> PostCar([FromForm] CarCreateDto carCreateDto)
         {
             if (carCreateDto == null) return BadRequest("Invalid car data");

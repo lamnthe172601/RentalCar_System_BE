@@ -1,4 +1,6 @@
-﻿using RentalCar_System.Data.CartRepository;
+﻿using RentalCar_System.Business.QueueService;
+using RentalCar_System.Data.CarRepository;
+using RentalCar_System.Data.CartRepository;
 using RentalCar_System.Models.DtoViewModel;
 using RentalCar_System.Models.Entity;
 using System;
@@ -12,10 +14,14 @@ namespace RentalCar_System.Business.CartService
     public class CartService : ICartService
     {
         private readonly ICartRepository _cartRepository;
+        private readonly IQueueService _queueService;
+        private readonly ICarRepository _carRepository;
 
-        public CartService(ICartRepository cartRepository)
+        public CartService(IQueueService queueService , ICartRepository cartRepository , ICarRepository carRepository)
         {
             _cartRepository = cartRepository;
+            _queueService = queueService;
+            _carRepository = carRepository;
         }
 
         public async Task<IEnumerable<CartItemDto>> GetCartItemsAsync(Guid userId)
@@ -34,24 +40,38 @@ namespace RentalCar_System.Business.CartService
             });
         }
 
-        public async Task<bool> AddToCartAsync(Guid userId, Guid carId)
+        public async Task<decimal> AddToCartAsync(Guid userId, Guid carId)
         {
-            var existingItems = await _cartRepository.GetCartItemsByUserIdAsync(userId);
+            var request = new AddToCartRequest { UserId = userId, CarId = carId };
+            _queueService.Enqueue(request);
+            await ProcessQueueAsync();
+            return await GetTotalPriceAsync(userId);
 
-            // Check if the car is already in the cart
-            if (existingItems.Any(c => c.CarId == carId))
-                return false;
+        }
+        private async Task ProcessQueueAsync()
+        {
+            if (_queueService.IsQueueEmpty()) return;
+
+            var request = _queueService.Dequeue();
+
+            
+            var existingItems = await _cartRepository.GetCartItemsByUserIdAsync(request.UserId);
+            if (existingItems.Any(c => c.CarId == request.CarId))
+            {
+                
+                return;
+            }
 
             var cartItem = new Cart
             {
-                UserId = userId,
-                CarId = carId,
+                UserId = request.UserId,
+                CarId = request.CarId,
                 DateAdded = DateTime.UtcNow
             };
 
+          
             await _cartRepository.AddCartItemAsync(cartItem);
             await _cartRepository.SaveChangesAsync();
-            return true;
         }
 
         public async Task<bool> RemoveFromCartAsync(Guid userId, Guid cartId)
@@ -64,5 +84,13 @@ namespace RentalCar_System.Business.CartService
             await _cartRepository.SaveChangesAsync();
             return true;
         }
+        public async Task<decimal> GetTotalPriceAsync(Guid userId)
+        {
+            var cartItems = await _cartRepository.GetCartItemsByUserIdAsync(userId);
+
+            
+            return cartItems.Sum(c => c.Car.Price);
+        }
+
     }
 }
