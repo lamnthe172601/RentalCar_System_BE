@@ -68,7 +68,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 return BadRequest(new { message = "Mật khẩu không chính xác" });
             }
 
-            if (!_memoryCache.TryGetValue($"EmailVerified_{user.Email}", out bool isEmailVerified) || !isEmailVerified)
+            if (!user.IsEmailConfirmed)
             {
                 return BadRequest(new { message = "Email chưa xác thực. Kiểm tra lại email." });
             }
@@ -243,21 +243,28 @@ namespace RentalCar_System.WebAPI.Controllers
         public async Task<IActionResult> UploadAvatar(IFormFile file)
         {
             if (file == null || file.Length == 0)
-            {
-                return BadRequest(new { message = "No file uploaded" });
-            }
+                return BadRequest(new { message = "Không có tệp nào được tải lên" });
+
+            // Validate file size (e.g., max 5MB)
+            if (file.Length > 5 * 1024 * 1024)
+                return BadRequest(new { message = "Kích thước tệp phải nhỏ hơn 5MB" });
+
+            // Validate file type
+            var allowedTypes = new[] { "image/jpeg", "image/png" };
+            if (!allowedTypes.Contains(file.ContentType.ToLower()))
+                return BadRequest(new { message = "Chỉ cho phép các tệp JPEG và PNG" });
+
             try
             {
                 var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
                 if (emailClaim == null)
-                {
-                    return Unauthorized(new { message = "Invalid token" });
-                }
-                var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower());
+                    return Unauthorized(new { message = "Token không hợp lệ" });
+
+                var user = await _dbContext.Users.SingleOrDefaultAsync(u =>
+                    u.Email.ToLower() == emailClaim.Value.ToLower());
+
                 if (user == null)
-                {
-                    return BadRequest(new { message = "Không tìm thấy người dùng." });
-                }
+                    return BadRequest(new { message = "Không tìm thấy người dùng" });
 
                 using (var memoryStream = new MemoryStream())
                 {
@@ -268,13 +275,15 @@ namespace RentalCar_System.WebAPI.Controllers
                 _dbContext.Users.Update(user);
                 await _dbContext.SaveChangesAsync();
 
-                return Ok(new { message = "File cập nhật thành công." });
+                return Ok(new { message = "Cập nhật ảnh đại diện thành công" });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = "Lỗi hệ thống" });
             }
         }
+
+
 
         [HttpGet("get-avatar")]
         [Authorize]
