@@ -21,10 +21,5 @@ namespace RentalCar_System.Business.BaseService
             return await _baseRepository.GetByIdAsync(id);
         }
 
-       
-        public async Task<T> SearchByNameAsync(string name)
-        {
-            return await _baseRepository.SearchByNameAsync(name);
-        }
     }
 }
