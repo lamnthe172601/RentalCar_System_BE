@@ -35,6 +35,9 @@ builder.Services.AddScoped<ICartRepository , CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
 
 
+builder.Services.AddHostedService<TokenCleanupService>();
+builder.Services.AddMemoryCache();
+builder.Services.AddHostedService<AccountCleanupService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
