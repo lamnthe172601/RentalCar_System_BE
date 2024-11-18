@@ -30,7 +30,7 @@ namespace RentalCar_System.Business.CartService
                 CarModel = c.Car.Model,
                 Price = c.Car.Price,
                 DateAdded = c.DateAdded ?? DateTime.UtcNow,
-                CarImages = c.Car.Images.Select(i => i.Image1).ToList()
+                CarImages = c.Car.Images.Select(i => i.Photo).ToList()
             });
         }
 
