@@ -78,7 +78,6 @@ public partial class RentalCarDBContext : DbContext
             entity.HasKey(e => e.ImgId).HasName("PK__Images__352F54F3C47D68DC");
 
             entity.Property(e => e.ImgId).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.Image1).HasColumnName("Image");
 
             entity.HasOne(d => d.Car).WithMany(p => p.Images)
                 .HasForeignKey(d => d.CarId)

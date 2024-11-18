@@ -17,15 +17,15 @@ public partial class User
 
     public string PhoneNumber { get; set; }
 
-    public string PhotoUrl { get; set; } = "images\\image-profile\\default.jpg";
-
     public string Role { get; set; } = "customer";
 
-    public string Status { get; set; } = " ACTIVATED";
+    public string Status { get; set; } = "actived";
 
     public bool IsEmailConfirmed { get; set; } = false;
 
-    public DateTime CreatedAt { get; set; } = DateTime.Now;
+    public DateTime CreatedAt { get; set; }
+
+    public byte[] Photo { get; set; }
 
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 

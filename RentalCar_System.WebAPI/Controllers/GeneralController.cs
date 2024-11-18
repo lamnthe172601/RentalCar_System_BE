@@ -54,23 +54,23 @@ namespace RentalCar_System.WebAPI.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                return BadRequest(new { message = "Invalid data provided", errors });
+                return BadRequest(new { message = "Dữ liệu không hợp lệ", errors });
             }
 
             var user = await _userService.GetUserByEmailAsync(model.Email);
             if (user == null)
             {
-                return BadRequest(new { message = "Invalid email or password" });
+                return BadRequest(new { message = "Email hoặc mật khẩu không chính xác" });
             }
 
             if (!VerifyPassword(model.Password, user.Password))
             {
-                return BadRequest(new { message = "Invalid password" });
+                return BadRequest(new { message = "Mật khẩu không chính xác" });
             }
 
             if (!_memoryCache.TryGetValue($"EmailVerified_{user.Email}", out bool isEmailVerified) || !isEmailVerified)
             {
-                return BadRequest(new { message = "Email not verified. Please check your email." });
+                return BadRequest(new { message = "Email chưa xác thực. Kiểm tra lại email." });
             }
 
             var token = _authService.GenerateJwtToken(user);
@@ -92,15 +92,15 @@ namespace RentalCar_System.WebAPI.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                return BadRequest(new { message = "Invalid data provided", errors });
+                return BadRequest(new { message = "Dữ liệu không hợp lệ", errors });
             }
             if (await EmailExists(model.Email))
             {
-                return BadRequest(new { message = "Email already exists" });
+                return BadRequest(new { message = "Email đã được sử dụng." });
             }
             if (await PhoneExists(model.PhoneNumber))
             {
-                return BadRequest(new { message = "Phone number already exists" });
+                return BadRequest(new { message = "Số điện thoại đã được sử dụng." });
             }
             var user = new User
             {
@@ -133,7 +133,7 @@ namespace RentalCar_System.WebAPI.Controllers
             var verificationLink = $"{frontendBaseUrl}/verify-email?token={verificationToken}&email={user.Email}";
             await _notificationService.SendEmailNotificationAsync(user.Email, "Verify your email", $"Please verify your email by clicking <a href='{verificationLink}'>here</a>.");
 
-            return Ok(new { message = "Registration successful. Please check your email to verify your account." });
+            return Ok(new { message = "Đăng kí thành công. Kiểm tra email để xác thực tài khoản." });
         }
 
 
@@ -144,7 +144,7 @@ namespace RentalCar_System.WebAPI.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                return BadRequest(new { message = "Invalid data provided", errors });
+                return BadRequest(new { message = "Dữ liệu không hợp lệ", errors });
             }
             var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             if (emailClaim == null)
@@ -154,15 +154,15 @@ namespace RentalCar_System.WebAPI.Controllers
             var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower());
             if (user == null)
             {
-                return BadRequest(new { message = "User not found" });
+                return BadRequest(new { message = "Không tìm thấy người dùng." });
             }
             if (!VerifyPassword(model.OldPassword, user.Password))
             {
-                return BadRequest(new { message = "Invalid old password" });
+                return BadRequest(new { message = "Mật khẩu cũ không chính xác." });
             }
             user.Password = HashPassword(model.NewPassword); _dbContext.Users.Update(user);
             await _dbContext.SaveChangesAsync();
-            return Ok(new { message = "Password changed successfully" });
+            return Ok(new { message = "Thay đổi mật khẩu thành công" });
         }
         private async Task<bool> PhoneExists(string phone)
         {
@@ -185,17 +185,17 @@ namespace RentalCar_System.WebAPI.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                return BadRequest(new { message = "Invalid data provided", errors });
+                return BadRequest(new { message = "Dữ liệu không hợp lệ", errors });
             }
             var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             if (emailClaim == null)
             {
-                return Unauthorized(new { message = "Invalid token" });
+                return Unauthorized(new { message = "Token không hợp lệ." });
             }
             var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower());
             if (user == null)
             {
-                return BadRequest(new { message = "User not found" });
+                return BadRequest(new { message = "Không tìm thấy người dùng." });
             }
             UserProfileViewModel model = new UserProfileViewModel
             {
@@ -215,7 +215,7 @@ namespace RentalCar_System.WebAPI.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                return BadRequest(new { message = "Invalid data provided", errors });
+                return BadRequest(new { message = "Dữ liệu không hợp lệ", errors });
             }
             var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             if (emailClaim == null)
@@ -225,17 +225,17 @@ namespace RentalCar_System.WebAPI.Controllers
             var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower());
             if (user == null)
             {
-                return BadRequest(new { message = "User not found" });
+                return BadRequest(new { message = "Không tìm thấy người dùng." });
             }
             user.Name = model.Name;
             if (user.PhoneNumber != model.PhoneNumber && await PhoneExists(model.PhoneNumber))
             {
-                return BadRequest(new { message = "PhoneNumber already Exsist" });
+                return BadRequest(new { message = "Số diện thoại đã được sử dụng." });
             }
             user.PhoneNumber = model.PhoneNumber;
             _dbContext.Users.Update(user);
             await _dbContext.SaveChangesAsync();
-            return Ok(new { message = "Updated profile successfully" });
+            return Ok(new { message = "Cập nhật thông tin thành công" });
         }
 
         [HttpPost("upload-avatar")]
@@ -256,12 +256,12 @@ namespace RentalCar_System.WebAPI.Controllers
                 var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower());
                 if (user == null)
                 {
-                    return BadRequest(new { message = "User not found" });
+                    return BadRequest(new { message = "Không tìm thấy người dùng." });
                 }
                 var userId = user.UserId;
                 // Lấy userId từ token
                 var filePath = await _userService.UpdateUserAvatarAsync(userId, file);
-                return Ok(new { message = "File uploaded successfully", filePath });
+                return Ok(new { message = "File cập nhật thành công.", filePath });
             }
             catch (Exception ex)
             {
@@ -276,18 +276,18 @@ namespace RentalCar_System.WebAPI.Controllers
             var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
             if (emailClaim == null)
             {
-                return Unauthorized(new { message = "Invalid token" });
+                return Unauthorized(new { message = "Token không hợp lệ." });
             }
             var user = await _dbContext.Users.SingleOrDefaultAsync(u => u.Email.ToLower() == emailClaim.Value.ToLower());
             if (user == null)
             {
-                return BadRequest(new { message = "User not found" });
+                return BadRequest(new { message = "Không tìm thấy người dùng." });
             }
 
             var avatarPath = Path.Combine(_environment.ContentRootPath, user.PhotoUrl);
             if (!System.IO.File.Exists(avatarPath))
             {
-                return NotFound(new { message = "Avatar file not found" });
+                return NotFound(new { message = "không tìm thấy Avatar" });
             }
 
             var fileBytes = await System.IO.File.ReadAllBytesAsync(avatarPath);
@@ -300,12 +300,12 @@ namespace RentalCar_System.WebAPI.Controllers
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == request.Email);
             if (user == null)
             {
-                return BadRequest(new { message = "Email not found" });
+                return BadRequest(new { message = "Không tìm thấy Email." });
             }
 
             if (!_memoryCache.TryGetValue($"EmailVerified_{user.Email}", out bool isEmailVerified) || !isEmailVerified)
             {
-                return BadRequest(new { message = "Email not verified. Please check your email." });
+                return BadRequest(new { message = "Email chưa xác thực. Kiểm tra email." });
             }
 
             // Check the last email sent time from MemoryCache
@@ -313,7 +313,8 @@ namespace RentalCar_System.WebAPI.Controllers
             {
                 if ((DateTime.UtcNow - lastEmailSentAt).TotalMinutes < 5)
                 {
-                    return BadRequest(new { message = "You can only request a password reset once every 5 minutes." });
+                    return BadRequest(new { message = "Bạn chỉ có thể yêu cầu đặt lại mật khẩu một lần mỗi 5 phút." });
+                   
                 }
             }
 
@@ -338,7 +339,7 @@ namespace RentalCar_System.WebAPI.Controllers
             // Update the last email sent time in MemoryCache
             _memoryCache.Set($"LastEmailSentAt_{user.Email}", DateTime.UtcNow, TimeSpan.FromMinutes(5));
 
-            return Ok(new { message = "Reset password link has been sent to your email." });
+            return Ok(new { message = "Reset password link đã được gửi về email của bạn." });
         }
 
 
@@ -356,7 +357,7 @@ namespace RentalCar_System.WebAPI.Controllers
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == resetToken.UserId);
             if (user == null)
             {              
-                return BadRequest(new { message = "User not found." });
+                return BadRequest(new { message = "Không tìm thấy người dùng.." });
             }
 
             user.Password = HashPassword(request.NewPassword);
@@ -376,19 +377,19 @@ namespace RentalCar_System.WebAPI.Controllers
             if (!ModelState.IsValid)
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-                return BadRequest(new { message = "Invalid data provided", errors });
+                return BadRequest(new { message = "Dữ liệu không hợp lệ", errors });
             }
 
             var token = await _dbContext.Tokens.FirstOrDefaultAsync(t => t.Token1 == request.Token && !t.IsUsed);
             if (token == null || token.ExpiresAt < DateTime.UtcNow)
             {
-                return BadRequest(new { message = "Invalid or expired token." });
+                return BadRequest(new { message = "Token hết hạn hoặc không hợp lệ." });
             }
 
             var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.UserId == token.UserId);
             if (user == null)
             {
-                return BadRequest(new { message = "User not found." });
+                return BadRequest(new { message = "Không tìm thấy người dùng.." });
             }
 
             user.IsEmailConfirmed = true;
@@ -399,7 +400,7 @@ namespace RentalCar_System.WebAPI.Controllers
 
             _memoryCache.Set($"EmailVerified_{user.Email}", true, TimeSpan.FromDays(30)); // Cache verification status for 30 days
 
-            return Ok(new { message = "Email verified successfully." });
+            return Ok(new { message = "Xác thực email thành công." });
         }
 
 
