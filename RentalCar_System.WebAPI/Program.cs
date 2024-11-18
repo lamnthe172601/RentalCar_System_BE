@@ -20,6 +20,7 @@ using RentalCar_System.Business.Background;
 using RentalCar_System.Data.CartRepository;
 using RentalCar_System.Business.CartService;
 using RentalCar_System.Business.QueueService;
+using RentalCar_System.Business.VnPayLibrary;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,6 +41,7 @@ builder.Services.AddScoped<IQueueService, QueueService>();
 builder.Services.AddHostedService<TokenCleanupService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddHostedService<AccountCleanupService>();
+builder.Services.AddSingleton<VnPayLibrary>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

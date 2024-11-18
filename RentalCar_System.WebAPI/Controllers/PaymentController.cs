@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using RentalCar_System.Business.CartService;
 using RentalCar_System.Business.VnPayLibrary;
-using RentalCar_System.Business.VnPayLibrary.RentalCar_System.Business.VnPayLibrary;
 using RentalCar_System.Models.DtoViewModel;
+using System.Globalization;
 
 namespace RentalCar_System.WebAPI.Controllers
 {
@@ -11,79 +11,119 @@ namespace RentalCar_System.WebAPI.Controllers
     [ApiController]
     public class PaymentController : ControllerBase
     {
-        private readonly ICartService _cartService;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<PaymentController> _logger;
 
-        public PaymentController(ICartService cartService, IConfiguration configuration)
+        public PaymentController(IConfiguration configuration, ILogger<PaymentController> logger)
         {
-            _cartService = cartService;
             _configuration = configuration;
+            _logger = logger;
         }
 
-        [HttpPost("vnpay")]
-        public async Task<IActionResult> CreatePayment([FromBody] PaymentRequestDto paymentRequest)
+        [HttpPost("create-payment")]
+        public IActionResult CreatePayment([FromBody] VnPayRequestModel model)
         {
-            var cartItems = await _cartService.GetCartItemsAsync(paymentRequest.UserId);
-            var totalAmount = cartItems.Sum(item => item.Price);
-
-            string vnp_TmnCode = _configuration["VNPay:vnp_TmnCode"];
-            string vnp_HashSecret = _configuration["VNPay:vnp_HashSecret"];
-            string vnp_Url = _configuration["VNPay:vnp_Url"];
-            string vnp_ReturnUrl = _configuration["VNPay:vnp_ReturnUrl"];
-
-            var vnpay = new VnPayLibrary();
-            vnpay.AddRequestData("vnp_Version", "2.1.0");
-            vnpay.AddRequestData("vnp_Command", "pay");
-            vnpay.AddRequestData("vnp_TmnCode", vnp_TmnCode);
-            vnpay.AddRequestData("vnp_Amount", (totalAmount * 100).ToString()); // Amount in smallest currency unit
-            vnpay.AddRequestData("vnp_CurrCode", "VND");
-            vnpay.AddRequestData("vnp_TxnRef", DateTime.Now.Ticks.ToString());
-            vnpay.AddRequestData("vnp_OrderInfo", "Payment for rental car");
-            vnpay.AddRequestData("vnp_OrderType", "billpayment");
-            vnpay.AddRequestData("vnp_Locale", "vn");
-            vnpay.AddRequestData("vnp_ReturnUrl", vnp_ReturnUrl);
-            vnpay.AddRequestData("vnp_IpAddr", Request.HttpContext.Connection.RemoteIpAddress.ToString());
-
-            // Log the request data
-            var requestData = vnpay.GetRequestData();
-            foreach (var data in requestData)
+            try
             {
-                Console.WriteLine($"{data.Key}: {data.Value}");
+                if (model == null || string.IsNullOrEmpty(model.OrderId) || model.Amount <= 0)
+                {
+                    return BadRequest("Invalid payment request data.");
+                }
+
+                var vnpay = new VnPayLibrary();
+                var tmnCode = _configuration["Vnpay:TmnCode"];
+                var hashSecret = _configuration["Vnpay:HashSecret"];
+                var baseUrl = _configuration["Vnpay:BaseUrl"];
+                var returnUrl = _configuration["Vnpay:ReturnUrl"];
+                var tick = DateTime.Now.Ticks.ToString();
+                string clientIPAddress = Utils.GetIpAddress(HttpContext);
+
+                vnpay.AddRequestData("vnp_Version", _configuration["Vnpay:Version"]);
+                vnpay.AddRequestData("vnp_Command", _configuration["Vnpay:Command"]);
+                vnpay.AddRequestData("vnp_TmnCode", tmnCode);
+                vnpay.AddRequestData("vnp_Amount", (model.Amount * 100).ToString(CultureInfo.InvariantCulture));
+                vnpay.AddRequestData("vnp_CreateDate", DateTime.Now.ToString("yyyyMMddHHmmss"));
+                vnpay.AddRequestData("vnp_CurrCode", _configuration["VnPay:CurrCode"]);
+                vnpay.AddRequestData("vnp_IpAddr", clientIPAddress);
+                vnpay.AddRequestData("vnp_ExpireDate", DateTime.Now.AddMinutes(15).ToString("yyyyMMddHHmmss"));
+                vnpay.AddRequestData("vnp_Locale", _configuration["VnPay:Locale"]);
+                vnpay.AddRequestData("vnp_OrderInfo", model.OrderInfo ?? $"Order {model.OrderId}");
+                vnpay.AddRequestData("vnp_OrderType", "VNPAY");
+                vnpay.AddRequestData("vnp_ReturnUrl", returnUrl);
+                vnpay.AddRequestData("vnp_TxnRef", tick);
+                vnpay.AddRequestData("vnp_BankCode", "NCB");
+
+                var paymentUrl = vnpay.CreateRequestUrl(baseUrl, hashSecret);
+
+                _logger.LogInformation("VNPAY payment URL created: {Url}", paymentUrl);
+
+                return Ok(new { Url = paymentUrl });
             }
-
-            string paymentUrl = vnpay.CreateRequestUrl(vnp_Url, vnp_HashSecret);
-
-            return Ok(new { paymentUrl });
+            catch (Exception ex)
+            {
+                _logger.LogError("Error creating payment URL: {Message}", ex.Message);
+                return StatusCode(500, "An error occurred while creating the payment URL.");
+            }
         }
 
 
-        [HttpGet("vnpay_return")]
+        [HttpGet("return")]
         public IActionResult PaymentReturn()
         {
-            var vnpayData = Request.Query;
-            var vnpay = new VnPayLibrary();
-
-            foreach (var (key, value) in vnpayData)
+            try
             {
-                if (!string.IsNullOrEmpty(key) && key.StartsWith("vnp_"))
+                var vnpay = new VnPayLibrary();
+                var hashSecret = _configuration["Vnpay:HashSecret"];
+
+                // Lấy dữ liệu từ callback
+                foreach (var (key, value) in Request.Query)
                 {
                     vnpay.AddResponseData(key, value);
                 }
-            }
 
-            string vnp_HashSecret = _configuration["VNPay:vnp_HashSecret"];
-            bool isValidSignature = vnpay.ValidateSignature(vnpayData, vnp_HashSecret);
+                // Xác minh chữ ký
+                if (!vnpay.ValidateSignature(Request.Query["vnp_SecureHash"], hashSecret))
+                {
+                    return BadRequest("Invalid signature.");
+                }
 
-            if (isValidSignature)
-            {
-                // Handle payment success
-                return Ok(new { message = "Payment successful" });
+                // Lấy trạng thái giao dịch
+                string transactionStatus = vnpay.GetResponseData("vnp_TransactionStatus");
+                if (transactionStatus == "00")
+                {
+                    return Ok(new
+                    {
+                        Status = "Success",
+                        Message = "Transaction successful.",
+                        OrderId = vnpay.GetResponseData("vnp_TxnRef"),
+                        Amount = vnpay.GetResponseData("vnp_Amount"),
+                        PaymentDate = vnpay.GetResponseData("vnp_PayDate")
+                    });
+                }
+
+                return BadRequest(new
+                {
+                    Status = "Failed",
+                    Message = "Transaction failed.",
+                    OrderId = vnpay.GetResponseData("vnp_TxnRef"),
+                    Amount = vnpay.GetResponseData("vnp_Amount")
+                });
             }
-            else
+            catch (Exception ex)
             {
-                // Handle payment failure
-                return BadRequest(new { message = "Invalid signature" });
+                _logger.LogError("Error processing VNPAY return: {Message}", ex.Message);
+                return StatusCode(500, "An error occurred while processing the payment return.");
             }
         }
+
+
+    }
+
+
+    public class VnPayRequestModel
+    {
+        public string OrderId { get; set; } // Unique order identifier
+        public decimal Amount { get; set; } // Payment amount
+        public string OrderInfo { get; set; } // Optional: Order description
     }
 }
