@@ -12,10 +12,10 @@ namespace RentalCar_System.Models.DtoViewModel
         public Guid CarId { get; set; }     
         public string CarName { get; set; } 
 
-        public string CarModel { get; set; }
+        public string CarStatus { get; set; }
         public decimal Price { get; set; }  
         public DateTime DateAdded { get; set; }
 
-        public List<byte[]> CarImages { get; set; } = new List<byte[]>();
+        public List<String> CarImages { get; set; } = new List<String>();
     }
 }

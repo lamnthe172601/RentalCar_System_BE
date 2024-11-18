@@ -1,4 +1,5 @@
-﻿using RentalCar_System.Business.BaseService;
+﻿using Microsoft.Extensions.Logging;
+using RentalCar_System.Business.BaseService;
 using RentalCar_System.Business.NotificationService;
 using RentalCar_System.Data;
 using RentalCar_System.Data.CarRepository;
@@ -23,6 +24,7 @@ namespace RentalCar_System.Business.RentalCarService
             _rentalContractRepository = rentalContractRepository;
             _carRepository = carRepository;
             _notificationService = notificationService;
+           
         }
 
         public async Task<IEnumerable<CarRented>> GetAllContractsByUserIdAsync(Guid userId, int pageNumber, int pageSize)
@@ -71,7 +73,7 @@ namespace RentalCar_System.Business.RentalCarService
                 RentalDate = rentalDate,
                 ReturnDate = returnDate,
                 TotalAmount = totalAmount,
-                Status = "Pending"  
+                Status = "Pending"
             };
 
             await _rentalContractRepository.AddContractAsync(rentalContract);

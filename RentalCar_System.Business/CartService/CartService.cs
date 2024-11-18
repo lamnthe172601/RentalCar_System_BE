@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RentalCar_System.Business.CartService
 {
@@ -33,10 +34,10 @@ namespace RentalCar_System.Business.CartService
                 CartId = c.CartId,
                 CarId = (Guid)c.CarId,
                 CarName = c.Car.Name,
-                CarModel = c.Car.Model,
+                CarStatus = c.Car.Status,
                 Price = c.Car.Price,
                 DateAdded = c.DateAdded ?? DateTime.UtcNow,
-                CarImages = c.Car.Images.Select(i => i.Photo).ToList()
+                CarImages = c.Car.Images.Select(i => Convert.ToBase64String(i.Photo)).ToList()
             });
         }
 

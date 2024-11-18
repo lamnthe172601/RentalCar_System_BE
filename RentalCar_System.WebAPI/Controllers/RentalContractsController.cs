@@ -58,13 +58,13 @@ namespace RentalCar_System.WebAPI.Controllers
             }
         }
 
-        [HttpPost("request")]
-        public async Task<IActionResult> SendRentRequest([FromBody] RentCarRequest request)
+        [HttpPost("rent")]
+        public async Task<IActionResult> RentCar([FromBody] RentCarRequest request)
         {
             try
             {
                 var rentalContract = await _rentalContractService.SendRentRequestAsync(request.UserId, request.CarId, request.RentalDate, request.ReturnDate);
-                return CreatedAtAction(nameof(GetRentalContractById), new { contractId = rentalContract.ContractId }, rentalContract);
+                return Ok("Rental request successfully created.");
             }
             catch (Exception ex)
             {
