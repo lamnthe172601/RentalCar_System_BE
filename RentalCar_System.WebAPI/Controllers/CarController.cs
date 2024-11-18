@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RentalCar_System.Business.CarService;
 using RentalCar_System.Models.DtoViewModel;
 using RentalCar_System.Models.Entity;
@@ -17,7 +18,7 @@ namespace RentalCar_System.WebAPI.Controllers
             _carService = carService;
         }
 
-        [HttpGet]
+        [HttpGet("all-car")]
         public async Task<IActionResult> GetAllCars()
         {
             var cars = await _carService.GetAllCarsAsync();
@@ -36,7 +37,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 Status = car.Status,
                 Price = car.Price,
                 Description = car.Description,
-                Images = car.Images.Select(img => img.Image1).ToList() // Chỉ trả về đường dẫn ảnh
+                Images = car.Images.Select(img => img.Photo).ToList() // Chỉ trả về đường dẫn ảnh
             }).ToList();
 
             return Ok(carDtos);
@@ -64,40 +65,30 @@ namespace RentalCar_System.WebAPI.Controllers
                 Status = car.Status,
                 Price = car.Price,
                 Description = car.Description,
-                Images = car.Images.Select(img => img.Image1).ToList() 
+                Images = car.Images.Select(img => img.Photo).ToList() 
             };
 
             return Ok(carDto);
         }
 
         // POST: api/Car
-        [HttpPost]
+
+        [HttpPost("add-car")]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> PostCar([FromForm] CarCreateDto carCreateDto)
         {
             if (carCreateDto == null) return BadRequest("Invalid car data");
 
-            string publicImagePath = null;
+            byte[] imageBytes = null;
 
-            // Lưu ảnh vào thư mục Images
+            // Lưu ảnh dưới dạng byte array
             if (carCreateDto.Image != null)
             {
-                var imagesPath = Path.Combine(Directory.GetCurrentDirectory(), ImagesFolder);
-
-                if (!Directory.Exists(imagesPath))
+                using (var memoryStream = new MemoryStream())
                 {
-                    Directory.CreateDirectory(imagesPath);
+                    await carCreateDto.Image.CopyToAsync(memoryStream);
+                    imageBytes = memoryStream.ToArray();
                 }
-
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(carCreateDto.Image.FileName)}";
-                var filePath = Path.Combine(imagesPath, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await carCreateDto.Image.CopyToAsync(stream);
-                }
-
-                // Tạo đường dẫn công khai cho ảnh
-                publicImagePath = $"/api/cars/images/{fileName}";
             }
 
             // Ánh xạ từ DTO sang entity Car
@@ -117,21 +108,19 @@ namespace RentalCar_System.WebAPI.Controllers
                 Status = carCreateDto.Status,
                 Price = carCreateDto.Price,
                 Description = carCreateDto.Description,
-                Images = new List<Models.Entity.Image>
-    {
-        new Models.Entity.Image
+                Images = imageBytes != null ? new List<Models.Entity.Image>
         {
-            ImgId = Guid.NewGuid(), // Tạo ID mới cho ảnh
-            CarId = carId,          // Liên kết với CarId
-            Image1 = publicImagePath
-        }
-    }
+            new Models.Entity.Image
+            {
+                ImgId = Guid.NewGuid(),
+                CarId = carId,
+                Photo = imageBytes
+            }
+        } : new List<Models.Entity.Image>()
             };
-
 
             await _carService.AddCarAsync(car);
 
-            // Trả về DTO
             var createdCarDto = new CarDto
             {
                 CarId = car.CarId,
@@ -147,13 +136,14 @@ namespace RentalCar_System.WebAPI.Controllers
                 Status = car.Status,
                 Price = car.Price,
                 Description = car.Description,
-                Images = car.Images.Select(i => i.Image1).ToList()
+                Images = car.Images.Select(i => i.Photo).ToList()
             };
 
             return CreatedAtAction(nameof(GetCarById), new { id = createdCarDto.CarId }, createdCarDto);
         }
 
-        [HttpPut("{id}")]
+
+        [HttpPut("edit-car")]
         public async Task<IActionResult> UpdateCar(Guid id, [FromForm] CarUpdateDto carUpdateDto)
         {
             if (id == Guid.Empty || carUpdateDto == null) return BadRequest("Invalid data.");
@@ -161,27 +151,16 @@ namespace RentalCar_System.WebAPI.Controllers
             var existingCar = await _carService.GetCarByIdAsync(id);
             if (existingCar == null) return NotFound("Car not found.");
 
-            string publicImagePath = null;
+            byte[] imageBytes = null;
 
             // Upload ảnh mới (nếu có)
             if (carUpdateDto.Image != null)
             {
-                var imagesPath = Path.Combine(Directory.GetCurrentDirectory(), ImagesFolder);
-
-                if (!Directory.Exists(imagesPath))
+                using (var memoryStream = new MemoryStream())
                 {
-                    Directory.CreateDirectory(imagesPath);
+                    await carUpdateDto.Image.CopyToAsync(memoryStream);
+                    imageBytes = memoryStream.ToArray();
                 }
-
-                var fileName = $"{Guid.NewGuid()}{Path.GetExtension(carUpdateDto.Image.FileName)}";
-                var filePath = Path.Combine(imagesPath, fileName);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await carUpdateDto.Image.CopyToAsync(stream);
-                }
-
-                publicImagePath = $"/api/cars/images/{fileName}";
             }
 
             // Cập nhật thông tin Car
@@ -198,7 +177,7 @@ namespace RentalCar_System.WebAPI.Controllers
             existingCar.Price = carUpdateDto.Price;
             existingCar.Description = carUpdateDto.Description ?? existingCar.Description;
 
-            if (publicImagePath != null)
+            if (imageBytes != null)
             {
                 // Xóa ảnh cũ và thêm ảnh mới
                 existingCar.Images.Clear();
@@ -206,7 +185,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 {
                     ImgId = Guid.NewGuid(),
                     CarId = existingCar.CarId,
-                    Image1 = publicImagePath
+                    Photo = imageBytes
                 });
             }
 
@@ -227,14 +206,14 @@ namespace RentalCar_System.WebAPI.Controllers
                 Status = existingCar.Status,
                 Price = existingCar.Price,
                 Description = existingCar.Description,
-                Images = existingCar.Images.Select(i => i.Image1).ToList()
+                Images = existingCar.Images.Select(i => i.Photo).ToList()
             });
         }
 
 
 
-        // DELETE: api/Car/{id}
-        [HttpDelete("{id}")]
+
+        [HttpDelete("id")]
         public async Task<IActionResult> DeleteCar(Guid id)
         {
             if (id == Guid.Empty)
@@ -245,16 +224,6 @@ namespace RentalCar_System.WebAPI.Controllers
                 return NotFound("Car not found.");
 
             // Xóa ảnh liên kết
-            var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "Images");
-            foreach (var image in existingCar.Images)
-            {
-                var imagePath = Path.Combine(imagesFolder, Path.GetFileName(image.Image1));
-                if (System.IO.File.Exists(imagePath))
-                {
-                    System.IO.File.Delete(imagePath);
-                }
-            }
-
             await _carService.DeleteCarAsync(id);
 
             return Ok(new CarDto
@@ -272,10 +241,9 @@ namespace RentalCar_System.WebAPI.Controllers
                 Status = existingCar.Status,
                 Price = existingCar.Price,
                 Description = existingCar.Description,
-                Images = existingCar.Images.Select(img => img.Image1).ToList()
+                Images = existingCar.Images.Select(i => i.Photo).ToList()
             });
         }
-
     }
 
 }
