@@ -11,6 +11,5 @@ namespace RentalCar_System.Business.BaseService
     {
 
         Task<T> GetByIdAsync(Guid id);       
-        Task<T> SearchByNameAsync(string name);
     }
 }
