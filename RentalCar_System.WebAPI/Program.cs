@@ -129,18 +129,7 @@ builder.Services.AddCors(options =>
 });
 #endregion
 
-builder.Services.AddControllers();
-var app = builder.Build();
 
-// Configure to serve static files from the Images directory
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(app.Environment.ContentRootPath, "Images")),
-    RequestPath = "/api/cars/images"
-});
-
-=======
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 var app = builder.Build();
