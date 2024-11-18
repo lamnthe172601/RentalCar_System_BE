@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RentalCar_System.Data.CarRepository;
+using RentalCar_System.Models.Entity;
+using RentalCar_System.Models.DtoViewModel;
 
 namespace RentalCar_System.Business.CarService
 {
@@ -25,5 +28,34 @@ namespace RentalCar_System.Business.CarService
         {
             return await _carRepository.GetCarByIdAsync(carId);
         }
+        public async Task<IEnumerable<Car>> GetAllCarsAsync()
+        {
+            return await _carRepository.GetAllAsync();
+        }
+
+        public async Task<CarDto> GetCarDTOByIdAsync(Guid id)
+        {
+            return await _carRepository.GetCarDtoByIdAsync(id); // Trả về DTO
+        }
+        
+
+        public async Task AddCarAsync(Car car)
+        {
+            await _carRepository.AddCarAsync(car);
+        }
+        public async Task UpdateCarAsync(Car car)
+        {
+            await _carRepository.UpdateCarAsync(car);
+        }
+
+        public async Task DeleteCarAsync(Guid id)
+        {
+            await _carRepository.DeleteCarAsync(id);
+        }
+        public async Task<Car> GetCarByLicensePlateAsync(string licensePlate)
+        {
+            return await _carRepository.GetCarByLicensePlateAsync(licensePlate);
+        }
     }
 }
+

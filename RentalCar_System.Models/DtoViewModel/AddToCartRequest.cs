@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 
 namespace RentalCar_System.Models.DtoViewModel
 {
-    public class UpdateUserViewModel
+    public class AddToCartRequest
     {
-        public string? Name { get; set; }                      
-
-        public string? PhoneNumber { get; set; }
-
-
+        public Guid UserId { get; set; }
+        public Guid CarId { get; set; }
     }
 }

@@ -8,6 +8,9 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using RentalCar_System.Models.Entity;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Hosting;
 
 namespace RentalCar_System.Business.UserService
 {
@@ -16,10 +19,11 @@ namespace RentalCar_System.Business.UserService
 
         private readonly IUserRepository _userRepository;
 
-
-        public UserService(IUserRepository userRepository)
+        private readonly IWebHostEnvironment _environment;
+        public UserService(IUserRepository userRepository, IWebHostEnvironment environment)
         {
             _userRepository = userRepository;
+            _environment = environment;
         }
         #region Customer
         public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -70,11 +74,33 @@ namespace RentalCar_System.Business.UserService
 
         public async Task<User> GetUserByEmailAsync(string email)
         {
-           return await _userRepository.GetByEmailAsync(email);
+            return await _userRepository.GetByEmailAsync(email);
         }
-        #endregion
 
+        public async Task<string> UpdateUserAvatarAsync(Guid userId, IFormFile avatarFile)
+        {
+            if (avatarFile == null || avatarFile.Length == 0)
+                throw new ArgumentException("No file uploaded");
+
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new InvalidOperationException("User not found");
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await avatarFile.CopyToAsync(memoryStream);
+                user.Photo = memoryStream.ToArray();
+            }
+
+            await _userRepository.UpdateAsync(user);
+
+            return "Avatar updated successfully";
+        }
 
     }
+    #endregion
+
 
 }
+
+

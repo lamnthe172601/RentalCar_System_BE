@@ -19,6 +19,10 @@
          "ObjectType": 0
       },
       {
+         "Name": "[dbo].[Cart]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[Images]",
          "ObjectType": 0
       },
@@ -28,6 +32,10 @@
       },
       {
          "Name": "[dbo].[RentalContracts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Tokens]",
          "ObjectType": 0
       },
       {

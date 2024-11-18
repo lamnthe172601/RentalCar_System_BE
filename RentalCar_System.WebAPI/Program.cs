@@ -9,12 +9,18 @@ using RentalCar_System.Data.RentalContractRepository;
 using RentalCar_System.Models.Entity;
 using RentalCar_System.Business.AuthService;
 using RentalCar_System.Business.UserService;
+using RentalCar_System.Data;
+using RentalCar_System.Business.CarService; // Add this line
 using RentalCar_System.Data.UserRepository;
 using System.Text;
 using RentalCar_System.Data.CarRepository;
 using RentalCar_System.Business.CarService;
 using RentalCar_System.Business.SearchService;
-
+using RentalCar_System.Business.NotificationService;
+using RentalCar_System.Business.Background;
+using RentalCar_System.Data.CartRepository;
+using RentalCar_System.Business.CartService;
+using RentalCar_System.Business.QueueService;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<RentalCarDBContext>(options =>
@@ -26,6 +32,16 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddControllers();
+builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddScoped<ICartRepository , CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IQueueService, QueueService>();
+
+
+builder.Services.AddHostedService<TokenCleanupService>();
+builder.Services.AddMemoryCache();
+builder.Services.AddHostedService<AccountCleanupService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -38,6 +54,9 @@ builder.Services.AddScoped<IRentalContractService, RentalContractService>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<ISearchService, SearchService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddHostedService<ExpiringContractsBackgroundService>();
+
 #endregion
 
 #region JWT
@@ -120,6 +139,11 @@ app.UseStaticFiles(new StaticFileOptions
         Path.Combine(app.Environment.ContentRootPath, "Images")),
     RequestPath = "/api/cars/images"
 });
+
+=======
+builder.Services.AddControllersWithViews();
+builder.Services.AddControllers();
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

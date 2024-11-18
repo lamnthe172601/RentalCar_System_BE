@@ -10,5 +10,6 @@ namespace RentalCar_System.Business.AuthService
     public interface IAuthService
     {
        string GenerateJwtToken(User user);
+
     }
 }

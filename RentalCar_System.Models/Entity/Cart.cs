@@ -5,13 +5,17 @@ using System.Collections.Generic;
 
 namespace RentalCar_System.Models.Entity;
 
-public partial class Image
+public partial class Cart
 {
-    public Guid ImgId { get; set; }
+    public Guid CartId { get; set; }
+
+    public Guid? UserId { get; set; }
 
     public Guid? CarId { get; set; }
 
-    public byte[] Photo { get; set; }
+    public DateTime? DateAdded { get; set; }
 
     public virtual Car Car { get; set; }
+
+    public virtual User User { get; set; }
 }
