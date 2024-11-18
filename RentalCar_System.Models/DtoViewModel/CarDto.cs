@@ -23,7 +23,7 @@ namespace RentalCar_System.Models.DtoViewModel
         public string Status { get; set; }
         public decimal Price { get; set; }
         public string Description { get; set; }
-        public List<byte[]> Images { get; set; }
+        public List<string> Images { get; set; }
         public IFormFile Image { get; set; }
      
 
