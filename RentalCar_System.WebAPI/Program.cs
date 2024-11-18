@@ -17,6 +17,8 @@ using RentalCar_System.Data.CarRepository;
 using RentalCar_System.Business.CarService;
 using RentalCar_System.Business.NotificationService;
 using RentalCar_System.Business.Background;
+using RentalCar_System.Data.CartRepository;
+using RentalCar_System.Business.CartService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +31,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddScoped<ICartRepository , CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
+
+
 builder.Services.AddHostedService<TokenCleanupService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddHostedService<AccountCleanupService>();
