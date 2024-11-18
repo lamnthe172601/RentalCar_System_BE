@@ -37,7 +37,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 Status = car.Status,
                 Price = car.Price,
                 Description = car.Description,
-                Images = car.Images.Select(img => img.Photo).ToList() // Chỉ trả về đường dẫn ảnh
+                Images = car.Images.Select(img => Convert.ToBase64String(img.Photo)).ToList() // Chỉ trả về đường dẫn ảnh
             }).ToList();
 
             return Ok(carDtos);
@@ -65,7 +65,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 Status = car.Status,
                 Price = car.Price,
                 Description = car.Description,
-                Images = car.Images.Select(img => img.Photo).ToList() 
+                Images = car.Images.Select(img => Convert.ToBase64String(img.Photo)).ToList() 
             };
 
             return Ok(carDto);
@@ -74,7 +74,7 @@ namespace RentalCar_System.WebAPI.Controllers
         // POST: api/Car
 
         [HttpPost("add-car")]
-        [Authorize(Roles = "admin")]
+        
         public async Task<IActionResult> PostCar([FromForm] CarCreateDto carCreateDto)
         {
             if (carCreateDto == null) return BadRequest("Invalid car data");
@@ -136,7 +136,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 Status = car.Status,
                 Price = car.Price,
                 Description = car.Description,
-                Images = car.Images.Select(i => i.Photo).ToList()
+                Images = car.Images.Select(img => Convert.ToBase64String(img.Photo)).ToList()
             };
 
             return CreatedAtAction(nameof(GetCarById), new { id = createdCarDto.CarId }, createdCarDto);
@@ -206,7 +206,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 Status = existingCar.Status,
                 Price = existingCar.Price,
                 Description = existingCar.Description,
-                Images = existingCar.Images.Select(i => i.Photo).ToList()
+                Images = existingCar.Images.Select(img => Convert.ToBase64String(img.Photo)).ToList()
             });
         }
 
@@ -241,7 +241,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 Status = existingCar.Status,
                 Price = existingCar.Price,
                 Description = existingCar.Description,
-                Images = existingCar.Images.Select(i => i.Photo).ToList()
+                Images = existingCar.Images.Select(img => Convert.ToBase64String(img.Photo)).ToList()
             });
         }
     }
