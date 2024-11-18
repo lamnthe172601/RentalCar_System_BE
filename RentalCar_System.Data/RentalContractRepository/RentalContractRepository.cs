@@ -43,7 +43,7 @@ namespace RentalCar_System.Data.RentalContractRepository
                 ReturnDate = rc.ReturnDate?.ToString("yyyy-MM-dd"),
                 RentalTime = rc.RentalDate.ToString("HH:mm"),
                 ReturnTime = rc.ReturnDate?.ToString("HH:mm"),
-                ImageUrls = rc.Car.Images.Select(img => img.Image1).ToList() 
+                ImageUrls = rc.Car.Images.Select(img => img.Photo).ToList() 
             }).ToList();
 
             return carRentedDTOs;
