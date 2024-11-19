@@ -46,6 +46,22 @@ namespace RentalCar_System.Data.CartRepository
         {
             await _context.SaveChangesAsync();
         }
+        public async Task RemoveFromCartByContractIdAsync(Guid contractId)
+        {
+            
+            var contractItems = await _context.RentalContracts
+                .Where(rc => rc.ContractId == contractId)
+                .ToListAsync();
 
+           
+            foreach (var contract in contractItems)
+            {
+                var cartItems = await _context.Carts
+                    .Where(c => c.CarId == contract.CarId)
+                    .ToListAsync();
+
+                _context.Carts.RemoveRange(cartItems); 
+            }
+        }
     }
 }

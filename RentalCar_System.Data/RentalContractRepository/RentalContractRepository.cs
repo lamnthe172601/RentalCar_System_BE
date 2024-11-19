@@ -117,6 +117,24 @@ namespace RentalCar_System.Data.RentalContractRepository
                 throw new Exception($"An error occurred while retrieving the user for the contract: {ex.Message}", ex);
             }
         }
+        public async Task UpdateContractStatusAsync(Guid contractId, string status)
+        {
+           
+            var contract = await _context.RentalContracts.FindAsync(contractId);
+
+            if (contract == null)
+            {
+                throw new Exception("Rental contract not found.");
+            }
+
+            
+            contract.Status = status;
+
+            _context.RentalContracts.Update(contract);
+            await _context.SaveChangesAsync();
+
+           
+        }
 
     }
 }

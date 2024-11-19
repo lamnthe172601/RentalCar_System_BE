@@ -19,5 +19,6 @@ namespace RentalCar_System.Data.RentalContractRepository
         Task<RentalContract> UpdateContractAsync(RentalContract rentalContract);
         Task<List<RentalContract>> GetAllAsync();
         Task<User> GetUserByContractIdAsync(Guid contractId);
+        Task UpdateContractStatusAsync(Guid contractId, string status);
     }
 }

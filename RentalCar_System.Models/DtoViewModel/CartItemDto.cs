@@ -11,7 +11,6 @@ namespace RentalCar_System.Models.DtoViewModel
         public Guid CartId { get; set; }    
         public Guid CarId { get; set; }     
         public string CarName { get; set; } 
-
         public string CarStatus { get; set; }
         public decimal Price { get; set; }  
         public DateTime DateAdded { get; set; }

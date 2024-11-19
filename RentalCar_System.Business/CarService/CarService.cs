@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using RentalCar_System.Data.CarRepository;
 using RentalCar_System.Models.Entity;
 using RentalCar_System.Models.DtoViewModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace RentalCar_System.Business.CarService
 {
@@ -56,6 +57,11 @@ namespace RentalCar_System.Business.CarService
         {
             return await _carRepository.GetCarByLicensePlateAsync(licensePlate);
         }
+        public async Task UpdateStatusCar(Guid carId, string status)
+        {
+            await _carRepository.UpdateStatusCar(carId, status);
+        }
+
     }
 }
 

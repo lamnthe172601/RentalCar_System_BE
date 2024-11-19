@@ -11,7 +11,6 @@ namespace RentalCar_System.Business.Background
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private Timer _timer;
-        private readonly TimeSpan _interval = TimeSpan.FromHours(24); 
 
         public ExpiringContractsBackgroundService(IServiceScopeFactory serviceScopeFactory)
         {
@@ -20,24 +19,24 @@ namespace RentalCar_System.Business.Background
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-           
-            _timer = new Timer(NotifyExpiringContracts, null, TimeSpan.Zero, _interval);
+            _timer = new Timer(NotifyExpiringContracts, null, TimeSpan.Zero, Timeout.InfiniteTimeSpan);
             return Task.CompletedTask;
         }
 
         private async void NotifyExpiringContracts(object state)
         {
-            
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var rentalContractService = scope.ServiceProvider.GetRequiredService<IRentalContractService>();
                 await rentalContractService.NotifyExpiringContractsAsync();
             }
+
+            // Change the timer to not repeat
+            _timer?.Change(Timeout.Infinite, 0);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            
             _timer?.Change(Timeout.Infinite, 0);
             return Task.CompletedTask;
         }

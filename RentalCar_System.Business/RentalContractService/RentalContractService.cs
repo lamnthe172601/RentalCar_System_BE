@@ -49,7 +49,7 @@ namespace RentalCar_System.Business.RentalCarService
             return await _rentalContractRepository.GetRentalContractByIdAsync(contractId);
         }
 
-        public async Task SendRentRequestAsync(Guid userId, Guid carId, DateTime rentalDate, DateTime returnDate)
+        public async Task <RentalContractDto>SendRentRequestAsync(Guid userId, Guid carId, DateTime rentalDate, DateTime returnDate)
         {
             var car = await _carRepository.GetCarByIdAsync(carId);
             if (car == null || car.Status != "Available")
@@ -77,6 +77,7 @@ namespace RentalCar_System.Business.RentalCarService
             };
 
             await _rentalContractRepository.AddContractAsync(rentalContractdto);
+            return rentalContractdto;
         }
 
 
@@ -151,6 +152,10 @@ namespace RentalCar_System.Business.RentalCarService
             {
                 Console.WriteLine($"Error in NotifyExpiringContracts: {ex.Message}");
             }
-        }       
+        }
+        public async Task UpdateContractStatusAsync(Guid contractId, string status)
+        {
+             await _rentalContractRepository.UpdateContractStatusAsync(contractId, status);
+        }
     }
 }

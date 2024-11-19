@@ -22,6 +22,8 @@ using RentalCar_System.Data.CartRepository;
 using RentalCar_System.Business.CartService;
 using RentalCar_System.Business.QueueService;
 using RentalCar_System.Business.VnPayLibrary;
+using RentalCar_System.Data.PaymentRepository;
+using RentalCar_System.Business.PaymentService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +37,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddControllers();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<ICartRepository , CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();

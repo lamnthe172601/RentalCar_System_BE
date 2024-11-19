@@ -63,10 +63,10 @@ namespace RentalCar_System.WebAPI.Controllers
             try
             {
                 
-                await _rentalContractService.SendRentRequestAsync(request.UserId, request.CarId, request.RentalDate, request.ReturnDate);
+               RentalContractDto rentalContractDto =  await _rentalContractService.SendRentRequestAsync(request.UserId, request.CarId, request.RentalDate, request.ReturnDate);
 
                 
-                return Ok(new { message = "Rental request has been successfully processed." });
+                return Ok(new { message = "Rental request has been successfully processed." , data = rentalContractDto });
             }
             catch (Exception ex)
             {
