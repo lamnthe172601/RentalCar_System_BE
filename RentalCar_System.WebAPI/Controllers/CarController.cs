@@ -213,7 +213,7 @@ namespace RentalCar_System.WebAPI.Controllers
 
 
 
-        [HttpDelete("id")]
+        [HttpDelete("delete-car/{id}")]
         public async Task<IActionResult> DeleteCar(Guid id)
         {
             if (id == Guid.Empty)
