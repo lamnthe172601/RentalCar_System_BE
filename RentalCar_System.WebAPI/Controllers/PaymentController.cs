@@ -203,7 +203,7 @@ namespace RentalCar_System.WebAPI.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update-Status{id}")]
         public async Task<IActionResult> UpdatePaymentStatus(Guid id,string status)
         {
 
