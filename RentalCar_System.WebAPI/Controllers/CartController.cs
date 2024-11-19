@@ -46,9 +46,12 @@ namespace RentalCar_System.Controllers
             var result = await _cartService.RemoveFromCartAsync(userId, cartId);
 
             if (result)
-                return Ok("Car removed from the cart successfully.");
-
-            return BadRequest("Unable to remove the car from the cart.");
+            {               
+                return Ok(new { message = "Car removed from the cart successfully." });
+            }
+           
+            return BadRequest(new { message = "Unable to remove the car from the cart." });
         }
+
     }
 }

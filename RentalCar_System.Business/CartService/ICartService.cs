@@ -14,6 +14,6 @@ namespace RentalCar_System.Business.CartService
         Task<decimal> AddToCartAsync(Guid userId, Guid carId);
         Task<bool> RemoveFromCartAsync(Guid userId, Guid cartId);
         Task<decimal> GetTotalPriceAsync(Guid userId);
-
+        Task RemoveFromCartByContractIdAsync(Guid contractId);
     }
 }

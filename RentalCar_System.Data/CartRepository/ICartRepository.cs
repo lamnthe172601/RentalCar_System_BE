@@ -14,6 +14,8 @@ namespace RentalCar_System.Data.CartRepository
         Task<Cart> GetCartItemByIdAndUserIdAsync(Guid cartId, Guid userId);
         Task AddCartItemAsync(Cart cartItem);
         Task RemoveCartItemAsync(Cart cartItem);
+        Task RemoveFromCartByContractIdAsync(Guid contractId);
         Task SaveChangesAsync();
+        
     }
 }

@@ -43,7 +43,7 @@ namespace RentalCar_System.Data.RentalContractRepository
                 ReturnDate = rc.ReturnDate?.ToString("yyyy-MM-dd"),
                 RentalTime = rc.RentalDate.ToString("HH:mm"),
                 ReturnTime = rc.ReturnDate?.ToString("HH:mm"),
-                ImageUrls = rc.Car.Images.Select(img => img.Photo).ToList() 
+                ImageUrls = rc.Car.Images.Select(img => Convert.ToBase64String(img.Photo)).ToList() 
             }).ToList();
 
             return carRentedDTOs;
@@ -57,11 +57,27 @@ namespace RentalCar_System.Data.RentalContractRepository
         }
 
 
-        public async Task<RentalContract> AddContractAsync(RentalContract rentalContract)
+        public async Task AddContractAsync(RentalContractDto rentalContractDto)
         {
+            if (rentalContractDto == null)
+            {
+                throw new ArgumentNullException(nameof(rentalContractDto), "Rental contract cannot be null.");
+            }
+
+            
+            var rentalContract = new RentalContract
+            {
+                ContractId = Guid.NewGuid(),  
+                UserId = rentalContractDto.UserId,
+                CarId = rentalContractDto.CarId,
+                RentalDate = rentalContractDto.RentalDate,
+                ReturnDate = rentalContractDto.ReturnDate,
+                TotalAmount = rentalContractDto.TotalAmount,
+                Status = rentalContractDto.Status  
+            };
+
             await _context.RentalContracts.AddAsync(rentalContract);
-            await _context.SaveChangesAsync();
-            return rentalContract;
+            await _context.SaveChangesAsync();  
         }
 
         public async Task<RentalContract> UpdateContractAsync(RentalContract rentalContract)
@@ -100,6 +116,24 @@ namespace RentalCar_System.Data.RentalContractRepository
             {
                 throw new Exception($"An error occurred while retrieving the user for the contract: {ex.Message}", ex);
             }
+        }
+        public async Task UpdateContractStatusAsync(Guid contractId, string status)
+        {
+           
+            var contract = await _context.RentalContracts.FindAsync(contractId);
+
+            if (contract == null)
+            {
+                throw new Exception("Rental contract not found.");
+            }
+
+            
+            contract.Status = status;
+
+            _context.RentalContracts.Update(contract);
+            await _context.SaveChangesAsync();
+
+           
         }
 
     }

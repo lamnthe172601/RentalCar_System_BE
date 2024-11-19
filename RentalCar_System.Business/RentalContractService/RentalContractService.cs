@@ -49,7 +49,7 @@ namespace RentalCar_System.Business.RentalCarService
             return await _rentalContractRepository.GetRentalContractByIdAsync(contractId);
         }
 
-        public async Task<RentalContract> SendRentRequestAsync(Guid userId, Guid carId, DateTime rentalDate, DateTime returnDate)
+        public async Task <RentalContractDto>SendRentRequestAsync(Guid userId, Guid carId, DateTime rentalDate, DateTime returnDate)
         {
             var car = await _carRepository.GetCarByIdAsync(carId);
             if (car == null || car.Status != "Available")
@@ -65,7 +65,7 @@ namespace RentalCar_System.Business.RentalCarService
 
             var totalAmount = rentalDays * car.Price;
 
-            var rentalContract = new RentalContract
+            var rentalContractdto = new RentalContractDto
             {
                 ContractId = Guid.NewGuid(),
                 UserId = userId,
@@ -76,9 +76,10 @@ namespace RentalCar_System.Business.RentalCarService
                 Status = "Pending"
             };
 
-            await _rentalContractRepository.AddContractAsync(rentalContract);
-            return rentalContract;
+            await _rentalContractRepository.AddContractAsync(rentalContractdto);
+            return rentalContractdto;
         }
+
 
         public async Task<bool> CancelRentalContractAsync(Guid contractId)
         {
@@ -151,6 +152,10 @@ namespace RentalCar_System.Business.RentalCarService
             {
                 Console.WriteLine($"Error in NotifyExpiringContracts: {ex.Message}");
             }
-        }       
+        }
+        public async Task UpdateContractStatusAsync(Guid contractId, string status)
+        {
+             await _rentalContractRepository.UpdateContractStatusAsync(contractId, status);
+        }
     }
 }

@@ -57,20 +57,24 @@ namespace RentalCar_System.WebAPI.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while fetching data.");
             }
         }
-
         [HttpPost("rent")]
         public async Task<IActionResult> RentCar([FromBody] RentCarRequest request)
         {
             try
             {
-                var rentalContract = await _rentalContractService.SendRentRequestAsync(request.UserId, request.CarId, request.RentalDate, request.ReturnDate);
-                return Ok("Rental request successfully created.");
+                
+               RentalContractDto rentalContractDto =  await _rentalContractService.SendRentRequestAsync(request.UserId, request.CarId, request.RentalDate, request.ReturnDate);
+
+                
+                return Ok(new { message = "Rental request has been successfully processed." , data = rentalContractDto });
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+               
+                return BadRequest(new { message = ex.Message });
             }
         }
+
 
         [HttpPost("{contractId}/cancel")]
         public async Task<IActionResult> CancelRentalContract(Guid contractId)

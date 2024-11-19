@@ -16,13 +16,13 @@ namespace RentalCar_System.Business.RentalCarService
         Task<int> GetTotalContractsByUserIdAsync(Guid userId);
         Task<RentalContract> GetRentalContractByIdAsync(Guid contractId);
 
-        Task<RentalContract> SendRentRequestAsync(Guid userId, Guid carId, DateTime rentalDate, DateTime returnDate);
+        Task <RentalContractDto> SendRentRequestAsync(Guid userId, Guid carId, DateTime rentalDate, DateTime returnDate);
 
         Task<bool> CancelRentalContractAsync(Guid contractId);
 
         Task<bool> UpdateFeedbackAndRatingAsync(Guid contractId, string feedback, int rating);
         Task NotifyExpiringContractsAsync();
-       
-      
+        Task UpdateContractStatusAsync(Guid contractId, string status);
+
     }
 }

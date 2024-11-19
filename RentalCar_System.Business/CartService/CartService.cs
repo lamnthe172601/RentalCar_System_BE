@@ -92,6 +92,9 @@ namespace RentalCar_System.Business.CartService
             
             return cartItems.Sum(c => c.Car.Price);
         }
-
+        public async Task RemoveFromCartByContractIdAsync(Guid contractId)
+        {
+            await _cartRepository.RemoveFromCartByContractIdAsync(contractId);
+        }
     }
 }
