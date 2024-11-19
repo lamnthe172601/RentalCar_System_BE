@@ -8,7 +8,7 @@ namespace RentalCar_System.Models.DtoViewModel
 {
     public class PaymentDto
     {
-       
+        
         public string ContractId { get; set; }
         public decimal Amount { get; set; }
         public DateTime PaymentDate { get; set; }

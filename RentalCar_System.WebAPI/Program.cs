@@ -42,6 +42,7 @@ builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<ICartRepository , CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IQueueService, QueueService>();
+builder.Services.AddScoped<PaymentService>();
 
 
 //builder.Services.AddHostedService<TokenCleanupService>();

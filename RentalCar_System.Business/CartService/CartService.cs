@@ -41,14 +41,13 @@ namespace RentalCar_System.Business.CartService
             });
         }
 
-        public async Task<decimal> AddToCartAsync(Guid userId, Guid carId)
+        public async Task AddToCartAsync(Guid userId, Guid carId)
         {
             var request = new AddToCartRequest { UserId = userId, CarId = carId };
-            _queueService.Enqueue(request);
-            await ProcessQueueAsync();
-            return await GetTotalPriceAsync(userId);
-
+            _queueService.Enqueue(request); 
+            await ProcessQueueAsync();     
         }
+
         private async Task ProcessQueueAsync()
         {
             if (_queueService.IsQueueEmpty()) return;

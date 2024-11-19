@@ -66,8 +66,7 @@ namespace RentalCar_System.Data.RentalContractRepository
 
             
             var rentalContract = new RentalContract
-            {
-                ContractId = Guid.NewGuid(),  
+            {   ContractId = rentalContractDto.ContractId,         
                 UserId = rentalContractDto.UserId,
                 CarId = rentalContractDto.CarId,
                 RentalDate = rentalContractDto.RentalDate,

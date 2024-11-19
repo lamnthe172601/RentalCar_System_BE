@@ -11,7 +11,7 @@ namespace RentalCar_System.Business.CartService
     public interface ICartService
     {
         Task<IEnumerable<CartItemDto>> GetCartItemsAsync(Guid userId);
-        Task<decimal> AddToCartAsync(Guid userId, Guid carId);
+        Task AddToCartAsync(Guid userId, Guid carId);
         Task<bool> RemoveFromCartAsync(Guid userId, Guid cartId);
         Task<decimal> GetTotalPriceAsync(Guid userId);
         Task RemoveFromCartByContractIdAsync(Guid contractId);
