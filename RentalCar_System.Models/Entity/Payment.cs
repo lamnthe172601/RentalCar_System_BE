@@ -13,7 +13,7 @@ public partial class Payment
 
     public Guid? UserId { get; set; }
 
-    public string PaymentMethod { get; set; }
+    public string PaymentMethod { get; set; } = "VNPay";
 
     public DateTime PaymentDate { get; set; }
 

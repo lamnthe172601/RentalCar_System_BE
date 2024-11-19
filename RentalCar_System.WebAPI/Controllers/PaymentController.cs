@@ -38,26 +38,12 @@ namespace RentalCar_System.WebAPI.Controllers
         {
             try
             {
-                if (model == null || string.IsNullOrEmpty(model.ContractId) || model.Amount <= 0)
+                if (model == null || string.IsNullOrEmpty(model.ContractId.ToString()) || model.Amount <= 0)
                 {
                     return BadRequest("Invalid payment request data.");
                 }
 
-                var contract = _rentalContractService.GetRentalContractByIdAsync(Guid.Parse(model.ContractId));
-
-                if (contract == null)
-                {
-                    return NotFound("Rental contract not found.");
-                }
-
-                await _paymentService.AddPaymentAsync(new Payment
-                {
-                    PaymentId = Guid.NewGuid(),
-                    ContractId = Guid.Parse(model.ContractId),
-                    Amount = model.Amount,
-                    PaymentDate = DateTime.Now,
-                    Status = "Pending",
-                });
+                
 
                 var vnpay = new VnPayLibrary();
                 var tmnCode = _configuration["Vnpay:TmnCode"];
@@ -86,7 +72,20 @@ namespace RentalCar_System.WebAPI.Controllers
 
                 _logger.LogInformation("VNPAY payment URL created: {Url}", paymentUrl);
 
+                var rentalContract =  await _rentalContractService.GetRentalContractByIdAsync(model.ContractId);
 
+                if (rentalContract == null)
+                {
+                    return NotFound("Rental contract not found.");
+                }
+
+                await _paymentService.AddPaymentAsync(new Payment
+                {   UserId = rentalContract.UserId,  
+                    ContractId = model.ContractId,
+                    Amount = model.Amount,
+                    PaymentDate = DateTime.Now,
+                    Status = "Pending",
+                });
                 return Ok(new { Url = paymentUrl });
             }
             catch (Exception ex)
@@ -230,7 +229,7 @@ namespace RentalCar_System.WebAPI.Controllers
 
     public class VnPayRequestModel
     {
-        public string ContractId { get; set; } // Unique order identifier
+        public Guid ContractId { get; set; } // Unique order identifier
         public decimal Amount { get; set; } // Payment amount      
     }
 }
