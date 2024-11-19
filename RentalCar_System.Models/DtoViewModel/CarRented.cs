@@ -20,7 +20,7 @@ namespace RentalCar_System.Models.DtoViewModel
         public int Seats { get; set; }
         public int Year { get; set; }
         public decimal Price { get; set; }
-        public List<byte[]> ImageUrls { get; set; }
+        public List<string> ImageUrls { get; set; }
         public string RentalDate { get; set; }
         public string ReturnDate { get; set; }
         public string RentalTime { get; set; }

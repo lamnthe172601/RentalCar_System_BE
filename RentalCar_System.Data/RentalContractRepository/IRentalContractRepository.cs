@@ -14,7 +14,7 @@ namespace RentalCar_System.Data.RentalContractRepository
         Task<IEnumerable<CarRented>> GetAllContractsByUserIdAsync(Guid userId);
         Task<RentalContract> GetRentalContractByIdAsync(Guid contractId);
 
-        Task<RentalContract> AddContractAsync(RentalContract rentalContract);
+        Task AddContractAsync(RentalContractDto rentalContractDto);
 
         Task<RentalContract> UpdateContractAsync(RentalContract rentalContract);
         Task<List<RentalContract>> GetAllAsync();
