@@ -121,10 +121,10 @@ namespace RentalCar_System.WebAPI.Controllers
                 string transactionStatus = vnpay.GetResponseData("vnp_TransactionStatus");
                 if (transactionStatus == "00")
                 {   
-                  await UpdatePaymentStatus(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Completed");
-                  await _rentalContract.UpdateContractStatusAsync(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Completed");
-                  await _cartService.RemoveFromCartByContractIdAsync(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")));
-                  await _carService.UpdateStatusCar(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Rented");
+                  //await UpdatePaymentStatus(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Completed");
+                  //await _rentalContract.UpdateContractStatusAsync(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Completed");
+                  //await _cartService.RemoveFromCartByContractIdAsync(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")));
+                  //await _carService.UpdateStatusCar(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Rented");
                     return Ok(new
                     {
                         Status = "Success",
@@ -134,8 +134,8 @@ namespace RentalCar_System.WebAPI.Controllers
                         PaymentDate = vnpay.GetResponseData("vnp_PayDate")
                     });
                 }
-                await UpdatePaymentStatus(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Fail");
-                await _rentalContract.UpdateContractStatusAsync(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Fail");
+                //await UpdatePaymentStatus(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Fail");
+                //await _rentalContract.UpdateContractStatusAsync(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Fail");
                 return BadRequest(new
                 {   
                     Status = "Failed",
