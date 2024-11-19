@@ -15,22 +15,33 @@ using RentalCar_System.Data.UserRepository;
 using System.Text;
 using RentalCar_System.Data.CarRepository;
 using RentalCar_System.Business.CarService;
+using RentalCar_System.Business.SearchService;
 using RentalCar_System.Business.NotificationService;
 using RentalCar_System.Business.Background;
-
+using RentalCar_System.Data.CartRepository;
+using RentalCar_System.Business.CartService;
+using RentalCar_System.Business.QueueService;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<RentalCarDBContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // Add services to the container.
 builder.Services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-builder.Services.AddScoped(typeof(IUserRepository), typeof(UserRepository));
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddControllers();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddScoped<ICartRepository , CartRepository>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<IQueueService, QueueService>();
 
 
+builder.Services.AddHostedService<TokenCleanupService>();
+builder.Services.AddMemoryCache();
+builder.Services.AddHostedService<AccountCleanupService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -42,9 +53,9 @@ builder.Services.AddScoped<IRentalContractRepository, RentalContractRepository>(
 builder.Services.AddScoped<IRentalContractService, RentalContractService>();
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddScoped<ISearchService, SearchService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddHostedService<ExpiringContractsBackgroundService>();
-
 
 #endregion
 
@@ -56,20 +67,29 @@ builder.Services.AddAuthentication(options =>
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 });
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
         {
-            options.TokenValidationParameters = new TokenValidationParameters
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtSettings["Issuer"],
+            ValidAudience = jwtSettings["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("5TgbNHY6UjmKL4pMdV9G7RbQ2wXA8Zc3Hty7Nr9Lq5l3PMi2Ue4hYvS7w3jKl9Pb"))
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
             {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings["Issuer"],
-                ValidAudience = jwtSettings["Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("5TgbNHY6UjmKL4pMdV9G7RbQ2wXA8Zc3Hty7Nr9Lq5l3PMi2Ue4hYvS7w3jKl9Pb"))
-            };
-            options.Events = new JwtBearerEvents { OnAuthenticationFailed = context => { context.NoResult(); context.Response.StatusCode = 401; context.Response.ContentType = "text/plain"; return context.Response.WriteAsync("Invalid token"); } };
-        });
+                context.NoResult();
+                context.Response.StatusCode = 401;
+                context.Response.ContentType = "text/plain";
+                return context.Response.WriteAsync("Invalid token");
+            }
+        };
+    });
 
 builder.Services.AddAuthorization();
 builder.Services.AddSwaggerGen(c =>
@@ -96,11 +116,10 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-
 #endregion
 
 #region CORS
-// Thêm dịch vụ CORS vào DI container.
+// Add CORS service to DI container.
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -109,17 +128,11 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader());
 });
 #endregion
+
+
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 var app = builder.Build();
-// Cấu hình để phục vụ các tệp tĩnh từ thư mục Images
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(
-    Path.Combine(app.Environment.ContentRootPath, "Images")),
-    RequestPath = "/images"
-});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -127,7 +140,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-// Thêm middleware CORS.
+
+// Add CORS middleware.
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseAuthentication();

@@ -23,15 +23,17 @@ public partial class RentalCarDBContext : DbContext
 
     public virtual DbSet<RentalContract> RentalContracts { get; set; }
 
+    public virtual DbSet<Token> Tokens { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Car>(entity =>
         {
-            entity.HasKey(e => e.CarId).HasName("PK__Cars__68A0342E6FC0904B");
+            entity.HasKey(e => e.CarId).HasName("PK__Cars__68A0342E623CC154");
 
-            entity.HasIndex(e => e.LicensePlate, "UQ__Cars__026BC15C32CE144D").IsUnique();
+            entity.HasIndex(e => e.LicensePlate, "UQ__Cars__026BC15C9EA35C6F").IsUnique();
 
             entity.Property(e => e.CarId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Brand).HasMaxLength(50);
@@ -53,7 +55,7 @@ public partial class RentalCarDBContext : DbContext
 
         modelBuilder.Entity<Cart>(entity =>
         {
-            entity.HasKey(e => e.CartId).HasName("PK__Cart__51BCD7B7D829B76D");
+            entity.HasKey(e => e.CartId).HasName("PK__Cart__51BCD7B7E7F5B984");
 
             entity.ToTable("Cart");
 
@@ -64,28 +66,27 @@ public partial class RentalCarDBContext : DbContext
 
             entity.HasOne(d => d.Car).WithMany(p => p.Carts)
                 .HasForeignKey(d => d.CarId)
-                .HasConstraintName("FK__Cart__CarId__5629CD9C");
+                .HasConstraintName("FK__Cart__CarId__5EBF139D");
 
             entity.HasOne(d => d.User).WithMany(p => p.Carts)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Cart__UserId__5535A963");
+                .HasConstraintName("FK__Cart__UserId__5DCAEF64");
         });
 
         modelBuilder.Entity<Image>(entity =>
         {
-            entity.HasKey(e => e.ImgId).HasName("PK__Images__352F54F3B94B9102");
+            entity.HasKey(e => e.ImgId).HasName("PK__Images__352F54F3C47D68DC");
 
             entity.Property(e => e.ImgId).HasDefaultValueSql("(newid())");
-            entity.Property(e => e.Image1).HasColumnName("Image");
 
             entity.HasOne(d => d.Car).WithMany(p => p.Images)
                 .HasForeignKey(d => d.CarId)
-                .HasConstraintName("FK__Images__CarId__2F10007B");
+                .HasConstraintName("FK__Images__CarId__4222D4EF");
         });
 
         modelBuilder.Entity<Payment>(entity =>
         {
-            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A386971C477");
+            entity.HasKey(e => e.PaymentId).HasName("PK__Payments__9B556A38ECAD8B61");
 
             entity.Property(e => e.PaymentId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
@@ -99,16 +100,16 @@ public partial class RentalCarDBContext : DbContext
 
             entity.HasOne(d => d.Contract).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.ContractId)
-                .HasConstraintName("FK__Payments__Contra__38996AB5");
+                .HasConstraintName("FK__Payments__Contra__4BAC3F29");
 
             entity.HasOne(d => d.User).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__Payments__UserId__398D8EEE");
+                .HasConstraintName("FK__Payments__UserId__4CA06362");
         });
 
         modelBuilder.Entity<RentalContract>(entity =>
         {
-            entity.HasKey(e => e.ContractId).HasName("PK__RentalCo__C90D3469AFE9842D");
+            entity.HasKey(e => e.ContractId).HasName("PK__RentalCo__C90D3469A54CA3C0");
 
             entity.Property(e => e.ContractId).HasDefaultValueSql("(newid())");
             entity.Property(e => e.RentalDate).HasColumnType("datetime");
@@ -120,22 +121,44 @@ public partial class RentalCarDBContext : DbContext
 
             entity.HasOne(d => d.Car).WithMany(p => p.RentalContracts)
                 .HasForeignKey(d => d.CarId)
-                .HasConstraintName("FK__RentalCon__CarId__33D4B598");
+                .HasConstraintName("FK__RentalCon__CarId__46E78A0C");
 
             entity.HasOne(d => d.User).WithMany(p => p.RentalContracts)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__RentalCon__UserI__32E0915F");
+                .HasConstraintName("FK__RentalCon__UserI__45F365D3");
+        });
+
+        modelBuilder.Entity<Token>(entity =>
+        {
+            entity.HasKey(e => e.TokenId).HasName("PK__Password__658FEEEA40727EE8");
+
+            entity.Property(e => e.TokenId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.ExpiresAt).HasColumnType("datetime");
+            entity.Property(e => e.Token1)
+                .IsRequired()
+                .HasMaxLength(100)
+                .HasColumnName("Token");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Tokens)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK__PasswordR__UserI__70DDC3D8");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4CDB782773");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CC4C2D13E610");
 
-            entity.HasIndex(e => e.PhoneNumber, "UQ__Users__85FB4E38ED346161").IsUnique();
+            entity.HasIndex(e => e.PhoneNumber, "UQ__Users__85FB4E3864CA75E2").IsUnique();
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534A00DF9F9").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D1053417D68972").IsUnique();
 
             entity.Property(e => e.UserId).HasDefaultValueSql("(newid())");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnType("datetime");
             entity.Property(e => e.Email)
                 .IsRequired()
                 .HasMaxLength(100);

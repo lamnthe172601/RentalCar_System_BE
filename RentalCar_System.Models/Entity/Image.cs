@@ -11,7 +11,7 @@ public partial class Image
 
     public Guid? CarId { get; set; }
 
-    public string Image1 { get; set; }
+    public byte[] Photo { get; set; }
 
     public virtual Car Car { get; set; }
 }
