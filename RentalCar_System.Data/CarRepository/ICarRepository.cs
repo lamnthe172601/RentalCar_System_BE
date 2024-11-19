@@ -22,5 +22,6 @@ namespace RentalCar_System.Data.CarRepository
         Task<Car> GetCarByLicensePlateAsync(string licensePlate);
 
         Task UpdateStatusCar(Guid carId, string status);
+        
     }
 }
