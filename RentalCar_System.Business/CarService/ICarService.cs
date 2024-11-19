@@ -19,7 +19,7 @@ namespace RentalCar_System.Business.CarService
         Task UpdateCarAsync(Car car);
 
         Task DeleteCarAsync(Guid id);
-        Task<Car> GetCarByLicensePlateAsync(string licensePlate);
+     
         Task UpdateStatusCar(Guid carId, string status);
        
     }

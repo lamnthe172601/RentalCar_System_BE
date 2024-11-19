@@ -53,10 +53,7 @@ namespace RentalCar_System.Business.CarService
         {
             await _carRepository.DeleteCarAsync(id);
         }
-        public async Task<Car> GetCarByLicensePlateAsync(string licensePlate)
-        {
-            return await _carRepository.GetCarByLicensePlateAsync(licensePlate);
-        }
+       
         public async Task UpdateStatusCar(Guid carId, string status)
         {
             await _carRepository.UpdateStatusCar(carId, status);
