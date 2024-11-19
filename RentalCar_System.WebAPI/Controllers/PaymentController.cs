@@ -62,7 +62,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 vnpay.AddRequestData("vnp_IpAddr", clientIPAddress);
                 vnpay.AddRequestData("vnp_ExpireDate", DateTime.Now.AddMinutes(15).ToString("yyyyMMddHHmmss"));
                 vnpay.AddRequestData("vnp_Locale", _configuration["VnPay:Locale"]);
-                vnpay.AddRequestData("vnp_OrderInfo", $"Order {model.ContractId}");
+                vnpay.AddRequestData("vnp_OrderInfo", $"{model.ContractId}");
                 vnpay.AddRequestData("vnp_OrderType", "VNPAY");
                 vnpay.AddRequestData("vnp_ReturnUrl", returnUrl);
                 vnpay.AddRequestData("vnp_TxnRef", tick);
@@ -115,31 +115,32 @@ namespace RentalCar_System.WebAPI.Controllers
                 {
                     return BadRequest("Invalid signature.");
                 }
+                var contractId = Guid.Parse(vnpay.GetResponseData("vnp_OrderInfo").Trim());
 
                 // Lấy trạng thái giao dịch
                 string transactionStatus = vnpay.GetResponseData("vnp_TransactionStatus");
                 if (transactionStatus == "00")
-                {   
-                  await UpdatePaymentStatus(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Completed");
-                  await _rentalContract.UpdateContractStatusAsync(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Completed");
-                  await _cartService.RemoveFromCartByContractIdAsync(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")));
-                  await _carService.UpdateStatusCar(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Rented");
+                {
+                   // await UpdatePaymentStatus( contractId, "Completed");
+                  //  await _rentalContract.UpdateContractStatusAsync( contractId, "Completed");
+                 //   await _cartService.RemoveFromCartByContractIdAsync( contractId);
+                    await _carService.UpdateStatusCar( contractId, "Rented");
                     return Ok(new
                     {
                         Status = "Success",
                         Message = "Transaction successful.",
-                        OrderId = vnpay.GetResponseData("vnp_TxnRef"),
+                        ContractId = vnpay.GetResponseData("vnp_OrderInfo"),
                         Amount = vnpay.GetResponseData("vnp_Amount"),
                         PaymentDate = vnpay.GetResponseData("vnp_PayDate")
                     });
                 }
-                await UpdatePaymentStatus(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Fail");
-                await _rentalContract.UpdateContractStatusAsync(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Fail");
+              //  await UpdatePaymentStatus( contractId, "Fail");
+             //   await _rentalContract.UpdateContractStatusAsync( contractId, "Fail");
                 return BadRequest(new
                 {   
                     Status = "Failed",
                     Message = "Transaction failed.",
-                    OrderId = vnpay.GetResponseData("vnp_TxnRef"),
+                    ContractId = vnpay.GetResponseData("vnp_OrderInfo"),
                     Amount = vnpay.GetResponseData("vnp_Amount")
                 });
             }
