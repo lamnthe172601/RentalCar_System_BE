@@ -19,6 +19,6 @@ namespace RentalCar_System.Data.CarRepository
         Task UpdateCarAsync(Car car);
 
         Task DeleteCarAsync(Guid id);
-        Task<Car> GetCarByLicensePlateAsync(string licensePlate);
+        
     }
 }

@@ -92,11 +92,7 @@ namespace RentalCar_System.Data.CarRepository
                 await _context.SaveChangesAsync();
             }
         }
-        public async Task<Car> GetCarByLicensePlateAsync(string licensePlate)
-        {
-            return await _context.Cars
-                .FirstOrDefaultAsync(c => c.LicensePlate == licensePlate); // Kiểm tra Car có LicensePlate trùng
-        }
+      
      
 
         public async Task<CarDto> GetCarDtoByIdAsync(Guid id)
