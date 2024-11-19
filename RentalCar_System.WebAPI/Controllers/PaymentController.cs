@@ -124,7 +124,7 @@ namespace RentalCar_System.WebAPI.Controllers
                    // await UpdatePaymentStatus( contractId, "Completed");
                   //  await _rentalContract.UpdateContractStatusAsync( contractId, "Completed");
                  //   await _cartService.RemoveFromCartByContractIdAsync( contractId);
-                    await _carService.UpdateStatusCar( contractId, "Rented");
+                 //   await _carService.UpdateStatusCar( contractId, "Rented");
                     return Ok(new
                     {
                         Status = "Success",

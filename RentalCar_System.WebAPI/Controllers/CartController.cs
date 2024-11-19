@@ -31,12 +31,13 @@ namespace RentalCar_System.Controllers
 
         // POST: api/cart/add
         [HttpPost("add")]
-        public async Task<ActionResult<decimal>> AddToCart([FromBody] AddToCartRequest request)
+        public async Task<IActionResult> AddToCart([FromBody] AddToCartRequest request)
         {
-            var totalPrice = await _cartService.AddToCartAsync(request.UserId, request.CarId);
+            await _cartService.AddToCartAsync(request.UserId, request.CarId);
 
-            return Ok(new { Message = "Car added to the cart successfully.", TotalPrice = totalPrice });
+            return Ok(new { Message = "Car added to the cart successfully." });
         }
+
 
 
         // DELETE: api/cart/remove/{cartId}/{userId}
