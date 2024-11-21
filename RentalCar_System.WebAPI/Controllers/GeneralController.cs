@@ -318,7 +318,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 return BadRequest(new { message = "Không tìm thấy Email." });
             }
 
-            if (!_memoryCache.TryGetValue($"EmailVerified_{user.Email}", out bool isEmailVerified) || !isEmailVerified)
+            if (!user.IsEmailConfirmed)
             {
                 return BadRequest(new { message = "Email chưa xác thực. Kiểm tra email." });
             }

@@ -11,6 +11,7 @@ namespace RentalCar_System.Data.PaymentRepository
     public interface IPaymentRepository
     {
         Task<Payment> GetByIdAsync(Guid id);
+        Task<Payment> GetByContractIdAsync(Guid id);
         Task<IEnumerable<Payment>> GetAllAsync();
         Task AddAsync(Payment payment);
         Task UpdateAsync(Payment payment);

@@ -22,6 +22,10 @@ namespace RentalCar_System.Data.PaymentRepository
         {
             return await _context.Payments.FindAsync(id);
         }
+        public async Task<Payment> GetByContractIdAsync(Guid id)
+        {
+            return await _context.Payments.FirstOrDefaultAsync(p=>p.ContractId==id);
+        }
 
         public async Task<IEnumerable<Payment>> GetAllAsync()
         {

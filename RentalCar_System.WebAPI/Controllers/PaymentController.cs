@@ -116,15 +116,15 @@ namespace RentalCar_System.WebAPI.Controllers
                     return BadRequest("Invalid signature.");
                 }
                 var contractId = Guid.Parse(vnpay.GetResponseData("vnp_OrderInfo").Trim());
-
+                var sum = 99;
                 // Lấy trạng thái giao dịch
                 string transactionStatus = vnpay.GetResponseData("vnp_TransactionStatus");
                 if (transactionStatus == "00")
-                {   
-                  //await UpdatePaymentStatus(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Completed");
-                  //await _rentalContract.UpdateContractStatusAsync(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Completed");
-                  //await _cartService.RemoveFromCartByContractIdAsync(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")));
-                  //await _carService.UpdateStatusCar(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Rented");
+                {
+                    await UpdatePaymentStatus(contractId, "Completed");
+                    await _rentalContract.UpdateContractStatusAsync(contractId, "Completed");
+                    await _cartService.RemoveFromCartByContractIdAsync(contractId);
+                    await _carService.UpdateStatusCar(contractId, "Rented");
                     return Ok(new
                     {
                         Status = "Success",
@@ -134,8 +134,8 @@ namespace RentalCar_System.WebAPI.Controllers
                         PaymentDate = vnpay.GetResponseData("vnp_PayDate")
                     });
                 }
-                //await UpdatePaymentStatus(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Fail");
-                //await _rentalContract.UpdateContractStatusAsync(Guid.Parse(vnpay.GetResponseData("vnp_TxnRef")), "Fail");
+                await UpdatePaymentStatus(contractId, "Fail");
+                await _rentalContract.UpdateContractStatusAsync(contractId, "Fail");
                 return BadRequest(new
                 {   
                     Status = "Failed",
@@ -203,11 +203,11 @@ namespace RentalCar_System.WebAPI.Controllers
             return NoContent();
         }
 
-        [HttpPut("update-Status{id}")]
+        [HttpPut("update-Status")]
         public async Task<IActionResult> UpdatePaymentStatus(Guid id,string status)
         {
 
-            var payment = await _paymentService.GetPaymentByIdAsync(id);
+            var payment = await _paymentService.GetPaymentByContractIdAsync(id);
             if (payment == null)
             {
                 return NotFound();
