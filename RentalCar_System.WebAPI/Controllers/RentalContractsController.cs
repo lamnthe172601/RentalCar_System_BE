@@ -128,7 +128,20 @@ namespace RentalCar_System.WebAPI.Controllers
                 
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-        }      
+        }
+        [HttpPut("{contractId}/status")]
+        public async Task<IActionResult> UpdateContractStatus(Guid contractId, [FromBody] string status)
+        {
+            try
+            {
+                await _rentalContractService.UpdateContractStatusAsync(contractId, status);
+                return Ok("Contract status updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error updating contract status: {ex.Message}");
+            }
+        }
 
     }
 }

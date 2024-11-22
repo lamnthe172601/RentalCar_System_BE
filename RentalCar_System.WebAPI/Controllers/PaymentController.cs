@@ -19,18 +19,21 @@ namespace RentalCar_System.WebAPI.Controllers
         private readonly ILogger<PaymentController> _logger;
         private readonly IRentalContractService _rentalContractService;
         private readonly PaymentService _paymentService;
-        private readonly IRentalContractService _rentalContract;
         private readonly ICartService _cartService;
         private readonly ICarService _carService;
         public PaymentController(IConfiguration configuration
             , ILogger<PaymentController> logger
             , IRentalContractService rentalContractService,
-              PaymentService paymentService)
+              PaymentService paymentService,
+                                 ICartService cartService,
+                                 ICarService carService)
         {
             _configuration = configuration;
             _logger = logger;
             _rentalContractService = rentalContractService;
             _paymentService = paymentService;
+            _cartService = cartService;
+            _carService = carService;
         }
 
         [HttpPost("create-payment")]
@@ -122,7 +125,7 @@ namespace RentalCar_System.WebAPI.Controllers
                 if (transactionStatus == "00")
                 {
                     await UpdatePaymentStatus(contractId, "Completed");
-                    await _rentalContract.UpdateContractStatusAsync(contractId, "Completed");
+                    await _rentalContractService.UpdateContractStatusAsync(contractId, "Completed");
                     await _cartService.RemoveFromCartByContractIdAsync(contractId);
                     await _carService.UpdateStatusCar(contractId, "Rented");
                     return Ok(new
@@ -135,7 +138,7 @@ namespace RentalCar_System.WebAPI.Controllers
                     });
                 }
                 await UpdatePaymentStatus(contractId, "Fail");
-                await _rentalContract.UpdateContractStatusAsync(contractId, "Fail");
+                await _rentalContractService.UpdateContractStatusAsync(contractId, "Fail");
                 return BadRequest(new
                 {   
                     Status = "Failed",

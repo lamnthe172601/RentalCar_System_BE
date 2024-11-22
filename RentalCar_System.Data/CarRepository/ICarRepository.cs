@@ -20,7 +20,7 @@ namespace RentalCar_System.Data.CarRepository
 
         Task DeleteCarAsync(Guid id);
       
-        Task UpdateStatusCar(Guid carId, string status);
+        Task UpdateStatusCar(Guid contractId, string status);
         
     }
 }

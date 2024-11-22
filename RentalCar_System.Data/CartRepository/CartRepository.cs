@@ -48,20 +48,26 @@ namespace RentalCar_System.Data.CartRepository
         }
         public async Task RemoveFromCartByContractIdAsync(Guid contractId)
         {
-            
-            var contractItems = await _context.RentalContracts
-                .Where(rc => rc.ContractId == contractId)
+            // Lấy hợp đồng với contractId
+            var contractItem = await _context.RentalContracts
+                .FirstOrDefaultAsync(rc => rc.ContractId == contractId);
+
+            // Nếu không tìm thấy hợp đồng, ném ngoại lệ
+            if (contractItem == null)
+            {
+                throw new KeyNotFoundException("Contract not found.");
+            }
+
+            // Lấy các mục trong giỏ hàng tương ứng với CarId của hợp đồng
+            var cartItems = await _context.Carts
+                .Where(c => c.CarId == contractItem.CarId)
                 .ToListAsync();
 
-           
-            foreach (var contract in contractItems)
-            {
-                var cartItems = await _context.Carts
-                    .Where(c => c.CarId == contract.CarId)
-                    .ToListAsync();
+            // Xóa các mục trong giỏ hàng
+            _context.Carts.RemoveRange(cartItems);
 
-                _context.Carts.RemoveRange(cartItems); 
-            }
+            // Lưu các thay đổi vào cơ sở dữ liệu
+            await _context.SaveChangesAsync();
         }
     }
 }

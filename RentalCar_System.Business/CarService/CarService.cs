@@ -54,9 +54,9 @@ namespace RentalCar_System.Business.CarService
             await _carRepository.DeleteCarAsync(id);
         }
        
-        public async Task UpdateStatusCar(Guid carId, string status)
+        public async Task UpdateStatusCar(Guid contractId, string status)
         {
-            await _carRepository.UpdateStatusCar(carId, status);
+            await _carRepository.UpdateStatusCar(contractId, status);
         }
 
        

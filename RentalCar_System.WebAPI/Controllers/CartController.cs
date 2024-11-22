@@ -53,6 +53,28 @@ namespace RentalCar_System.Controllers
            
             return BadRequest(new { message = "Unable to remove the car from the cart." });
         }
+        [HttpDelete("RemoveFromCart/{contractId}")]
+        public async Task<IActionResult> RemoveFromCartByContractIdAsync(Guid contractId)
+        {
+            if (contractId == Guid.Empty)
+            {
+                return BadRequest("Invalid contract ID.");
+            }
+
+            try
+            {
+                await _cartService.RemoveFromCartByContractIdAsync(contractId);
+                return Ok(new { message = "Contract removed from the cart successfully." });
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound("Contract not found in the cart.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error.");
+            }
+        }
 
     }
 }

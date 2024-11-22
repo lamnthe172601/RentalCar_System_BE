@@ -118,14 +118,24 @@ namespace RentalCar_System.Data.CarRepository
                 Images = car.Images.Select(img => Convert.ToBase64String(img.Photo)).ToList()
             };
         }
-        public async Task UpdateStatusCar(Guid carId, string status)
+        public async Task UpdateStatusCar(Guid contractId, string status)
         {
-            var car = await GetCarByIdAsync(carId);
-            if (car != null)
+            
+            var rentalContract = await _context.RentalContracts.FirstOrDefaultAsync(rc => rc.ContractId == contractId);
+            if (rentalContract != null)
             {
-                car.Status = status;
-                _context.Cars.Update(car);
-                await _context.SaveChangesAsync();
+               
+                var carId = rentalContract.CarId;
+
+                
+                var car = await _context.Cars.FirstOrDefaultAsync(c => c.CarId == carId);
+                if (car != null)
+                {
+                    
+                    car.Status = status;
+                    _context.Cars.Update(car);
+                    await _context.SaveChangesAsync();
+                }
             }
         }
     }
