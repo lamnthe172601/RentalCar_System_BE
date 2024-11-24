@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RentalCar_System.Business.PaymentService
 {
-    public class PaymentService
+    public class PaymentService : IPaymentService
     {
         private readonly IPaymentRepository _paymentRepository;
 
@@ -51,5 +51,19 @@ namespace RentalCar_System.Business.PaymentService
             await _paymentRepository.DeleteAsync(id);
         }
 
+        public async Task<decimal> GetTotalRevenueAsync()
+        {
+            return await _paymentRepository.GetTotalAmountAsync();
+        }
+
+        public async Task<int> GetPaymentCountByStatusAsync(string status)
+        {
+            return await _paymentRepository.GetPaymentCountByStatusAsync(status);
+        }
+
+        public async Task<IEnumerable<Payment>> GetPaymentsByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            return await _paymentRepository.GetPaymentsByDateRangeAsync(startDate, endDate);
+        }
     }
 }

@@ -44,6 +44,8 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IQueueService, QueueService>();
 builder.Services.AddScoped<PaymentService>();
 
+builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 //builder.Services.AddHostedService<TokenCleanupService>();
 builder.Services.AddMemoryCache();

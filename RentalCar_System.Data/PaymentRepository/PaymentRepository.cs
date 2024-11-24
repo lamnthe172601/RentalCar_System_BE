@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace RentalCar_System.Data.PaymentRepository
 {
     public class PaymentRepository : IPaymentRepository
@@ -52,6 +53,23 @@ namespace RentalCar_System.Data.PaymentRepository
                 _context.Payments.Remove(payment);
                 await _context.SaveChangesAsync();
             }
+            
+            }
+        public async Task<decimal> GetTotalAmountAsync()
+        {
+            return await _context.Payments.SumAsync(p => p.Amount);
+        }
+
+        public async Task<int> GetPaymentCountByStatusAsync(string status)
+        {
+            return await _context.Payments.CountAsync(p => p.Status == status);
+        }
+
+        public async Task<IEnumerable<Payment>> GetPaymentsByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            return await _context.Payments
+                .Where(p => p.PaymentDate >= startDate && p.PaymentDate <= endDate)
+                .ToListAsync();
         }
     }
 }

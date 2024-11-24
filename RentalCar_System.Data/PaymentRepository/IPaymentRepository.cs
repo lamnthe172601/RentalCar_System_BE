@@ -1,10 +1,9 @@
-﻿using RentalCar_System.Models.Entity
-    ;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+﻿using RentalCar_System.Models.Entity;
 
 namespace RentalCar_System.Data.PaymentRepository
 {
@@ -16,5 +15,8 @@ namespace RentalCar_System.Data.PaymentRepository
         Task AddAsync(Payment payment);
         Task UpdateAsync(Payment payment);
         Task DeleteAsync(Guid id);
+        Task<decimal> GetTotalAmountAsync();
+        Task<int> GetPaymentCountByStatusAsync(string status);
+        Task<IEnumerable<Payment>> GetPaymentsByDateRangeAsync(DateTime startDate, DateTime endDate);
     }
 }
